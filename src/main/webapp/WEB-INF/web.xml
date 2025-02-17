@@ -4,6 +4,17 @@
          http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
          version="3.0">
 
+    <!-- Spring 전역 설정 -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>/WEB-INF/applicationContext.xml</param-value>
+    </context-param>
+
+    <!-- applicationContext.xml 로드 -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    
     <!-- DispatcherServlet 설정 -->
     <servlet>
         <servlet-name>spring</servlet-name>
