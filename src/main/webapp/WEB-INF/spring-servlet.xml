@@ -16,9 +16,4 @@
         <property name="suffix" value=".jsp"/>
     </bean>
 
-    <!-- MyBatis Mapper 자동 스캔 -->
-    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-        <property name="basePackage" value="com.moviment.mapper"/>
-    </bean>
-
 </beans>
