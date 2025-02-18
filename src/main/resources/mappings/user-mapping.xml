@@ -6,7 +6,7 @@
 
     <insert id="saveUser">
         <![CDATA[
-            INSERT INTO USERS VALUES (USER_ID_SEQ.NEXTVAL, #{PASSWORD}, #{EMAIL}, #{USERNAME}, #{AUTH_PROVIDER}, #{ROLE})
+            INSERT INTO USERS VALUES (USER_ID_SEQ.NEXTVAL, #{email}, #{password}, #{username}, NVL(#{auth_provider, jdbcType=VARCHAR}, 'LOCAL'), SYSTIMESTAMP, NVL(#{role, jdbcType=VARCHAR}, 'USER'))
         ]]>
     </insert>
     <select id="getUser" resultType="user">
