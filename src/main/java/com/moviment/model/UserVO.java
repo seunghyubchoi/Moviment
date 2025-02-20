@@ -9,7 +9,8 @@ import javax.validation.constraints.Size;
 
 @Getter
 @Setter
-@ToString(exclude = "password")
+/*@ToString(exclude = "password")*/
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserVO {

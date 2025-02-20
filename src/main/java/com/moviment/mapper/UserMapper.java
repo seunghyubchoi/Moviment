@@ -7,4 +7,5 @@ import org.apache.ibatis.annotations.Mapper;
 public interface UserMapper {
     UserVO getUser(UserVO user);
     void saveUser(UserVO user);
+    UserVO findUserByEmail(String userEmail);
 }

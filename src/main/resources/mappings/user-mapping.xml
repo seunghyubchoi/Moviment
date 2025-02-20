@@ -16,4 +16,11 @@
              WHERE ID = #{ID}
         ]]>
     </select>
+    <select id="findUserByEmail" resultType="user">
+        <![CDATA[
+            SELECT *
+              FROM USERS
+             WHERE ID = #{userEmail}
+        ]]>
+    </select>
 </mapper>

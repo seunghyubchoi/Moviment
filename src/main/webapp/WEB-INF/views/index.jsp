@@ -7,8 +7,8 @@
     <div>
         <form action="/login" method="post">
             <div>
-                <label for="username">아이디</label>
-                <input type="text" id="username" name="username">
+                <label for="email">E-mail</label>
+                <input type="text" id="email" name="email">
             </div>
             <div>
                 <label for="password">비밀번호</label>

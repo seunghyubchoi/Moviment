@@ -37,6 +37,14 @@
       <version>5.3.24</version>
     </dependency>
 
+    <!-- BCrypt -->
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-core</artifactId>
+      <version>5.8.0</version>
+    </dependency>
+
+
     <!-- Spring JDBC -->
     <dependency>
       <groupId>org.springframework</groupId>

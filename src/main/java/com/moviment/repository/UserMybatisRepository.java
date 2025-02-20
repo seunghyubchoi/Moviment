@@ -8,8 +8,12 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class UserMybatisRepository implements UserRepository {
 
-    @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    public void setUserMapper(UserMapper userMapper) {
+        this.userMapper = userMapper;
+    }
 
     @Override
     public void saveUser(UserVO user) {
@@ -19,5 +23,10 @@ public class UserMybatisRepository implements UserRepository {
     @Override
     public UserVO getUser(UserVO user) {
         return userMapper.getUser(user);
+    }
+
+    @Override
+    public UserVO findUserByEmail(String userEmail) {
+        return userMapper.findUserByEmail(userEmail);
     }
 }
