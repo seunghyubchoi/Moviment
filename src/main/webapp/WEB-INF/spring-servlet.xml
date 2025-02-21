@@ -11,13 +11,13 @@
            http://www.springframework.org/schema/context
            http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <!-- 1️⃣ Spring MVC 설정 -->
+    <!-- Spring MVC 설정 -->
     <mvc:annotation-driven />
 
     <!-- Component Scan -->
     <context:component-scan base-package="com.moviment"/>
 
-    <!-- 4️⃣ Validator 설정 (Hibernate Validator 활성화) -->
+    <!-- Validator 설정 (Hibernate Validator 활성화) -->
     <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean" />
 
     <!-- ViewResolver 설정 -->

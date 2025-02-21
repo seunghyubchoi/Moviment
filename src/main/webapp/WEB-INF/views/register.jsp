@@ -7,36 +7,43 @@
     <title>Title</title>
 </head>
 <script>
-    let email = document.querySelector('input[name="email"]');
-    let password = document.querySelector('input[name="password"]');
-    let username = document.querySelector('input[name="username"]');
 
-    if (email.trim() === "") {
-        alert("이메일을 입력하세요.");
-    }
+    document.addEventListener("DOMContentLoaded", function() {
+       let registerForm = document.getElementById("registerForm");
+        registerForm.addEventListener("submit", function(event){
 
-    if (password.trim() === "") {
-        alert("비밀번호를 입력하세요.");
-    }
+           let email = document.querySelector('input[name="email"]');
+           let password = document.querySelector('input[name="password"]');
+           let username = document.querySelector('input[name="username"]');
 
-    if (username.trim() === "") {
-        alert("아이디를 입력하세요.");
-    }
+           if (email.value.trim() === "") {
+               alert("이메일을 입력하세요.");
+               event.preventDefault();
+           } else if (password.value.trim() === "") {
+               alert("비밀번호를 입력하세요.");
+               event.preventDefault();
+           } else if (username.value.trim() === "") {
+               alert("아이디를 입력하세요.");
+               event.preventDefault();
+           }
+       });
+    });
+
 </script>
 <body>
-    <form action="/register" method="post">
+    <form action="/register" method="post" id="registerForm">
         <table>
             <tr>
                 <th>E-mail</th>
-                <td><input type="text" name="email" required></td>
+                <td><input type="text" name="email"></td>
             </tr>
             <tr>
                 <th>비밀번호</th>
-                <td><input type="password" name="password" required></td>
+                <td><input type="password" name="password"></td>
             </tr>
             <tr>
                 <th>이름</th>
-                <td><input type="text" name="username" required></td>
+                <td><input type="text" name="username"></td>
             </tr>
         </table>
         <button type="submit">회원가입</button>
@@ -44,5 +51,11 @@
     <form action="/" method="get">
         <button type="submit">취소</button>
     </form>
+
+    <c:if test="${not empty errorMessage}">
+        <script>
+            alert("${errorMessage}");
+        </script>
+    </c:if>
 </body>
 </html>

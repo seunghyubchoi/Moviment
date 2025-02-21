@@ -24,25 +24,21 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void saveUser(UserVO user) {
-        System.out.println("BCrypt before saving");
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        System.out.println(user);
-        //userRepository.saveUser(user);
+        userRepository.saveUser(user);
     }
 
     @Override
     public UserVO getUser(UserVO user) {
-
-        // 입력 메일로 조회
         UserVO savedUser = findByUserEmail(user.getEmail());
 
         String loginPassword = user.getPassword();
         String savedPassword = savedUser.getPassword();
 
         if (!checkPassword(loginPassword, savedPassword)) {
-            System.out.println("FAILLLLLLLLLLLLLLLLLLLL");
+
         } else {
-            System.out.println("SUCCESSSSSSSSSSSSSSSSSS");
+
         }
         //return userRepository.getUser(user);
         return null;

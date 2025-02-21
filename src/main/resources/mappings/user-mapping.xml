@@ -20,7 +20,7 @@
         <![CDATA[
             SELECT *
               FROM USERS
-             WHERE ID = #{userEmail}
+             WHERE EMAIL = #{userEmail}
         ]]>
     </select>
 </mapper>
