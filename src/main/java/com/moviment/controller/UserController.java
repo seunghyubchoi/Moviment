@@ -39,8 +39,13 @@ public class UserController {
      * @param user
      */
     @PostMapping(value= "/login")
-    public void login(UserVO user) {
-        userService.getUser(user);
+    public String login(UserVO user, Model model, BindingResult result) {
+        UserVO loginUser = userService.getUser(user, model, result);
+        if (loginUser != null) {
+            return "main";
+        } else {
+            return "login";
+        }
     }
 
     /**

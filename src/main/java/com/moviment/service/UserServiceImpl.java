@@ -5,6 +5,8 @@ import com.moviment.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -29,19 +31,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserVO getUser(UserVO user) {
+    public UserVO getUser(UserVO user, Model model, BindingResult result) {
         UserVO savedUser = findByUserEmail(user.getEmail());
 
         String loginPassword = user.getPassword();
         String savedPassword = savedUser.getPassword();
 
         if (!checkPassword(loginPassword, savedPassword)) {
-
+            model.addAttribute("errorMessage", result.getAllErrors().get(0).getDefaultMessage());
+            return null;
         } else {
-
+            return userRepository.getUser(user);
         }
-        //return userRepository.getUser(user);
-        return null;
     }
 
     @Override
