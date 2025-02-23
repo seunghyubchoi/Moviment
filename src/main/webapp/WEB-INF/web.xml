@@ -45,7 +45,7 @@
             <param-value>UTF-8</param-value>
         </init-param>
         <init-param>
-            <param-name>ignore</param-name>
+            <param-name>forceEncoding</param-name>
             <param-value>true</param-value>
         </init-param>
     </filter>

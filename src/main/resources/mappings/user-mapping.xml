@@ -4,18 +4,23 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.moviment.mapper.UserMapper">
 
+    <!-- 회원 추가 -->
     <insert id="saveUser">
         <![CDATA[
-            INSERT INTO USERS VALUES (USER_ID_SEQ.NEXTVAL, #{email}, #{password}, #{username}, NVL(#{auth_provider, jdbcType=VARCHAR}, 'LOCAL'), SYSTIMESTAMP, NVL(#{role, jdbcType=VARCHAR}, 'USER'))
+            INSERT INTO USERS VALUES (USER_ID_SEQ.NEXTVAL, #{email}, #{password}, #{username}, #{auth_provider}, SYSTIMESTAMP, #{role}, 0)
         ]]>
     </insert>
+
+    <!-- 회원 검색(로그인) -->
     <select id="getUser" resultType="user">
         <![CDATA[
             SELECT *
               FROM USERS
-             WHERE ID = #{ID}
+             WHERE ID = #{ID}B
         ]]>
     </select>
+
+    <!-- 회원 검색(이메일로 검색) -->
     <select id="findUserByEmail" resultType="user">
         <![CDATA[
             SELECT *
@@ -23,4 +28,11 @@
              WHERE EMAIL = #{userEmail}
         ]]>
     </select>
+
+    <!-- 비밀번호 횟수 업데이트 -->
+    <update id="updatePwdErrCnt">
+        UPDATE USERS
+           SET PWD_ERR_CNT = #{errCnt}
+         WHERE EMAIL = #{userEmail}
+    </update>
 </mapper>

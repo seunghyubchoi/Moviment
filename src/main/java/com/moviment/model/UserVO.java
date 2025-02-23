@@ -19,6 +19,7 @@ public class UserVO {
     // 이메일, 비밀번호, 이름 순으로 입력 됨
 
     @Email(message = "올바른 이메일 형식을 입력하세요.")
+    @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$", message = "이메일 형식이 올바르지 않습니다.")
     @NotBlank(message = "이메일을 입력해주세요.")
     private String email;
 
@@ -33,4 +34,6 @@ public class UserVO {
     private String auth_provider;
 
     private String role;
+
+    private int pwdErrCnt;
 }

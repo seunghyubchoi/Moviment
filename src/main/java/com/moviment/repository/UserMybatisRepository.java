@@ -29,4 +29,9 @@ public class UserMybatisRepository implements UserRepository {
     public UserVO findUserByEmail(String userEmail) {
         return userMapper.findUserByEmail(userEmail);
     }
+
+    @Override
+    public int updatePwdErrCnt(int errCnt, String userEmail) {
+        return userMapper.updatePwdErrCnt(errCnt, userEmail);
+    }
 }

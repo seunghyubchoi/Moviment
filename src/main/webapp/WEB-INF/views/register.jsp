@@ -4,7 +4,7 @@
 
 <html>
 <head>
-    <title>Title</title>
+    <title>Moviment</title>
 </head>
 <script>
 
@@ -51,10 +51,10 @@
     <form action="/" method="get">
         <button type="submit">취소</button>
     </form>
-
-    <c:if test="${not empty errorMessage}">
+    <c:if test="${not empty message}">
+        var msg = '<c:out value="${message}" escapeXml="false" />'
         <script>
-            alert("${errorMessage}");
+            alert(msg);
         </script>
     </c:if>
 </body>

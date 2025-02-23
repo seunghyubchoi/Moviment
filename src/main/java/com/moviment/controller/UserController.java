@@ -3,7 +3,6 @@ package com.moviment.controller;
 import com.moviment.model.UserVO;
 import com.moviment.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -30,7 +29,11 @@ public class UserController {
      * @return
      */
     @GetMapping("/")
-    public String index() {
+    public String index(@ModelAttribute("message") String message, Model model) {
+        if(message != null && !message.isEmpty()) {
+            model.addAttribute("message", message);
+        }
+        System.out.println(model.getAttribute("message"));
         return "index";
     }
 
@@ -39,13 +42,15 @@ public class UserController {
      * @param user
      */
     @PostMapping(value= "/login")
-    public String login(UserVO user, Model model, BindingResult result) {
+    public String login(UserVO user, Model model, BindingResult result, HttpSession session) {
         UserVO loginUser = userService.getUser(user, model, result);
-        if (loginUser != null) {
-            return "main";
-        } else {
-            return "login";
-        }
+        // 로그인 성공 시 세션에 사용자 정보 저장
+        session.setAttribute("userId", loginUser.getId());
+        session.setAttribute("userEmail", loginUser.getEmail());
+        session.setAttribute("userName", loginUser.getUsername());
+        session.setAttribute("userRole", loginUser.getRole());
+        session.setAttribute("userAuth", loginUser.getAuth_provider());
+        return "redirect:/layout";
     }
 
     /**
@@ -61,16 +66,17 @@ public class UserController {
      * 회원가입
      * @param user
      * @param result
+     * @param redirectAttributes
+     * @param model
      * @return
      */
     @PostMapping("/register")
-    public String register(@Valid @ModelAttribute UserVO user, BindingResult result, HttpSession session, Model model) {
+    public String register(@Valid @ModelAttribute UserVO user, BindingResult result, RedirectAttributes redirectAttributes, Model model) {
         System.out.println("register 유효성 검사 시작");
         if(result.hasErrors()) {
             System.out.println("유효성 검사 실패 : " + result.getAllErrors());
-            //redirectAttributes.addFlashAttribute("errorMessage", result.getAllErrors().get(0).getDefaultMessage());
             // 현재 페이지에서 에러 메세지 출력할 것이므로 redirectAttributes -> Model 로 변경
-            model.addAttribute("errorMessage", result.getAllErrors().get(0).getDefaultMessage());
+            model.addAttribute("message", result.getAllErrors().get(0).getDefaultMessage());
             return "register";
         }
 
@@ -81,9 +87,18 @@ public class UserController {
             user.setRole("USER");
         }
 
-        System.out.println(user);
         userService.saveUser(user);
+        redirectAttributes.addFlashAttribute("message", "회원가입이 완료되었습니다! 가입한 아이디로 로그인하시기 바랍니다.");
         return "redirect:/";
+    }
+
+    /**
+     * 모든 페이지 포함 jsp
+     * @return
+     */
+    @GetMapping("/layout")
+    public String layout() {
+        return "layout";
     }
 
 }

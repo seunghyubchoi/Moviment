@@ -8,4 +8,5 @@ public interface UserMapper {
     UserVO getUser(UserVO user);
     void saveUser(UserVO user);
     UserVO findUserByEmail(String userEmail);
+    int updatePwdErrCnt(int errCnt, String userEmail);
 }
