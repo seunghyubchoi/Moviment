@@ -50,6 +50,7 @@ public class UserServiceImpl implements UserService {
     public UserVO getUser(UserVO user, Model model, BindingResult result) {
         // 이메일 검증
         UserVO savedUser = findByUserEmail(user.getEmail());
+        System.out.println("savedUser = " + savedUser);
 
         if (savedUser == null) {
             // 아이디 혹은 비밀번호 중 어느 것이 맞는지 모르게 끔
@@ -63,6 +64,7 @@ public class UserServiceImpl implements UserService {
 
         if(!checkPassword(loginPassword, savedPassword)) {
             int pwdErrCnt = savedUser.getPwdErrCnt();
+            System.out.println(pwdErrCnt + "!!!!!!!!!!");
 
             if(pwdErrCnt >= 5) {
                 throw new LoginException("로그인 5회 실패로 로그인이 제한되었습니다. \n관리자에게 문의해주세요.");

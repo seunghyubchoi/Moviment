@@ -31,7 +31,7 @@ public class UserMybatisRepository implements UserRepository {
     }
 
     @Override
-    public int updatePwdErrCnt(int errCnt, String userEmail) {
-        return userMapper.updatePwdErrCnt(errCnt, userEmail);
+    public void updatePwdErrCnt(int errCnt, String userEmail) {
+        userMapper.updatePwdErrCnt(errCnt, userEmail);
     }
 }

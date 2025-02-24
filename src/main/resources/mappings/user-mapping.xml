@@ -14,16 +14,30 @@
     <!-- 회원 검색(로그인) -->
     <select id="getUser" resultType="user">
         <![CDATA[
-            SELECT *
+            SELECT ID
+                 , EMAIL
+                 , PASSWORD
+                 , USERNAME
+                 , AUTH_PROVIDER
+                 , CREATED_AT
+                 , ROLE
+                 , PWD_ERR_CNT AS pwdErrCnt
               FROM USERS
-             WHERE ID = #{ID}B
+             WHERE ID = #{ID}
         ]]>
     </select>
 
     <!-- 회원 검색(이메일로 검색) -->
     <select id="findUserByEmail" resultType="user">
         <![CDATA[
-            SELECT *
+            SELECT ID
+                 , EMAIL
+                 , PASSWORD
+                 , USERNAME
+                 , AUTH_PROVIDER
+                 , CREATED_AT
+                 , ROLE
+                 , PWD_ERR_CNT AS pwdErrCnt
               FROM USERS
              WHERE EMAIL = #{userEmail}
         ]]>
@@ -31,8 +45,10 @@
 
     <!-- 비밀번호 횟수 업데이트 -->
     <update id="updatePwdErrCnt">
-        UPDATE USERS
-           SET PWD_ERR_CNT = #{errCnt}
-         WHERE EMAIL = #{userEmail}
+        <![CDATA[
+           UPDATE USERS
+              SET PWD_ERR_CNT = #{errCnt}
+            WHERE EMAIL = #{userEmail}
+         ]]>
     </update>
 </mapper>
