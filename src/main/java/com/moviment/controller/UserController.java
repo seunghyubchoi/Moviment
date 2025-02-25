@@ -50,6 +50,7 @@ public class UserController {
         session.setAttribute("userName", loginUser.getUsername());
         session.setAttribute("userRole", loginUser.getRole());
         session.setAttribute("userAuth", loginUser.getAuth_provider());
+        System.out.println("session : " + session.toString());
         return "redirect:/layout";
     }
 
@@ -90,15 +91,6 @@ public class UserController {
         userService.saveUser(user);
         redirectAttributes.addFlashAttribute("message", "회원가입이 완료되었습니다! 가입한 아이디로 로그인하시기 바랍니다.");
         return "redirect:/";
-    }
-
-    /**
-     * 모든 페이지 포함 jsp
-     * @return
-     */
-    @GetMapping("/layout")
-    public String layout() {
-        return "layout";
     }
 
 }
