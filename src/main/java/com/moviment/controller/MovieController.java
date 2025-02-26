@@ -21,7 +21,7 @@ public class MovieController {
 
     @GetMapping("/search")
     public void searchTest(String keyword) {
-        System.out.println("search 테스트!!!!");
+        System.out.println("MovieController search : " + keyword);
         movieService.search(keyword);
     }
 
