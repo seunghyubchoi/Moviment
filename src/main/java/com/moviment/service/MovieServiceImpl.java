@@ -1,15 +1,16 @@
 package com.moviment.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.moviment.exception.MovieException;
+import com.moviment.model.MovieVO;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class MovieServiceImpl implements MovieService {
@@ -18,13 +19,13 @@ public class MovieServiceImpl implements MovieService {
     private final String baseUrl = "https://api.themoviedb.org/3";
 
     @Override
-        public String search(String keyword) {
+        public List<MovieVO> searchMovies(String keyword, Model model) {
         System.out.println("MovieServiceImpl.search : " + keyword);
         String endPoint = "/search/movie?query=";
         String language = "&language=ko";
-
-        String urlString = baseUrl + endPoint + keyword + language;
-        System.out.println(urlString);
+        String urlString = null;
+        //String urlString = baseUrl + endPoint + keyword + language;
+        //System.out.println(urlString);
 
         // HttpURLConnection
         /*
@@ -56,19 +57,71 @@ public class MovieServiceImpl implements MovieService {
         headers.set("Accept", "application/json");
         headers.set("Authorization", "Bearer " + apiKey);
 
-        // 직렬화된 결과 (JSON)
-        //HttpEntity<String> entity = new HttpEntity<String>(headers);
-        //ResponseEntity<String> responseEntity = restTemplate.exchange(urlString, HttpMethod.GET, entity, String.class);
-        //System.out.println(responseEntity.getBody());
+        List<MovieVO> list = new ArrayList<>();
 
-        // JSON -> JAVA
-        String jsonResponse = restTemplate.getForObject(urlString, String.class); // DB JSON DATA를 문자열로
-        System.out.println(jsonResponse);
+        int currentPage = 1;
+        int totalPages = 1;
 
+        try {
 
+            while (currentPage <= totalPages && currentPage <= 500) {
+                urlString = baseUrl + endPoint + keyword + language + "&page=" + currentPage;
+                System.out.println("요청 url : " + urlString);
+                // 직렬화된 결과 (JSON)
+                HttpEntity<String> entity = new HttpEntity<String>(headers);
+                ResponseEntity<String> response = restTemplate.exchange(urlString, HttpMethod.GET, entity, String.class);
 
+                if(!response.getStatusCode().is2xxSuccessful()) {
+                    throw new MovieException("TMDB API 호출 실패 : " + response.getStatusCode());
+                }
 
-        //return responseEntity.getBody();
-        return null;
+                if(response.getBody() == null) {
+                    throw new MovieException("TMDB API 응답이 비어 있습니다.");
+                }
+
+                ObjectMapper objectMapper = new ObjectMapper();
+
+                JsonNode rootResults = objectMapper.readTree(response.getBody()); // 응답 데이터
+
+                System.out.println(rootResults);
+
+                JsonNode totalResults = rootResults.get("total_results");
+                if(totalResults == null || totalResults.asInt() == 0) {
+                    throw new MovieException("조회 결과가 없습니다.");
+                }
+
+                JsonNode results = rootResults.get("results");
+                if(results == null || !results.isArray()) {
+                    throw new MovieException("결과 데이터의 형식이 올바르지 않습니다.");
+                }
+
+                if (currentPage == 1) { // 첫 번째 요청에서 total_pages 값을 가져옴
+                    totalPages = rootResults.get("total_pages").asInt();
+                    if(totalPages >= 20) {
+                        throw new MovieException("데이터가 많습니다. 검색어를 추가해주세요.");
+                    }
+                    System.out.println("총 페이지 수: " + totalPages);
+                }
+
+                for(JsonNode result : results) {
+                    MovieVO movieVO = new MovieVO(
+                            result.get("id").asInt(),
+                            result.get("title").asText(),
+                            result.get("overview").asText(),
+                            result.get("popularity").asText(),
+                            result.get("poster_path").asText(),
+                            result.get("release_date").asText(),
+                            result.get("vote_average").asText()
+                    );
+                    list.add(movieVO);
+                }
+
+                currentPage++;
+            }
+        } catch (Exception e) {
+            throw new MovieException("JSON 처리 오류 : " + e.getMessage());
+        }
+
+        return list;
     }
 }
