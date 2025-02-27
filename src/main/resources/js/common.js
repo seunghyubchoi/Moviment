@@ -8,6 +8,7 @@ window.onload = function () {
 document.addEventListener("DOMContentLoaded", function() {
     loginValidation(); // 로그인 폼 검증
     onSelectMenu(); // 메뉴 클릭 시 AJAX로 content 변경
+    onSearchMovie(); // 영화 검색 기능
 });
 
 // 로그인 폼 검증
@@ -43,8 +44,11 @@ function onSelectMenu() {
                 .then(html => {
                     document.getElementById("content").innerHTML = html;
 
-                    // 메뉴 선택 시 바로 실행할 어떤 것
-                    //initContentPage(contentPage);
+                    // AJAX로 페이지 로드한 경우, 이벤트 리스너 재등록
+                    if(contentPage === "search") {
+                        onSearchMovie();
+                    }
+
                 })
                 .catch(error => console.error("AJAX 오류:", error));
         });
@@ -62,4 +66,43 @@ function initContentPage(contentPage) {
                 console.log(response.json());
             }
         })
+}
+
+function onSearchMovie() {
+    let searchForm = document.getElementById("searchForm");
+    if(searchForm) {
+        searchForm.addEventListener("submit", function (event) {
+            event.preventDefault(); // 기본 폼 제출 방지
+
+            let keyword = document.getElementById("keyword").value;
+            fetch("/api/search?keyword=" + encodeURIComponent(keyword))
+                .then(response => {
+                    return response.json().then(result => {
+                        if(!response.ok) {
+                            return Promise.reject(result.message);
+                        } else {
+                            return result;
+                        }
+                    })
+                })
+                .then(data => {
+                    let searchResult = document.getElementById("searchResults");
+                    searchResult.innerHTML = ""; // 기존 내용 초기화
+
+                    console.log("data");
+                    console.log(data);
+
+                    if(data && data.length > 0) {
+
+                        let resultHtml = "<ul>";
+                        data.forEach(movie => {
+                            resultHtml += `<li>${movie.title}</li>`;
+                        });
+                        resultHtml += "</ul>";
+                        searchResult.innerHTML = resultHtml;
+                    }
+                })
+                .catch(error => alert(error));
+        });
+    }
 }
