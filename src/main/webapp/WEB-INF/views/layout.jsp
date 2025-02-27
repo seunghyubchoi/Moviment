@@ -4,6 +4,12 @@
 <html>
 <head>
     <title>Moviment</title>
+
+    <script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
+    <script>
+        let serverMessage = "${message}";
+    </script>
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { display: flex; height: 100vh; }

@@ -17,6 +17,9 @@
     <!-- Component Scan -->
     <context:component-scan base-package="com.moviment"/>
 
+    <!-- 정적 리소스 -->
+    <mvc:resources mapping="/resources/**" location="classpath:/js" />
+
     <!-- Validator 설정 (Hibernate Validator 활성화) -->
     <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean" />
 
