@@ -2,6 +2,7 @@ package com.moviment.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.moviment.dto.SearchResult;
 import com.moviment.exception.MovieException;
 import com.moviment.model.MovieVO;
 import org.springframework.http.*;
@@ -19,7 +20,7 @@ public class MovieServiceImpl implements MovieService {
     private final String baseUrl = "https://api.themoviedb.org/3";
 
     @Override
-        public List<MovieVO> searchMovies(String keyword, Model model) {
+        public SearchResult searchMovies(String keyword, Model model) {
         System.out.println("MovieServiceImpl.search : " + keyword);
         String endPoint = "/search/movie?query=";
         String language = "&language=ko";
@@ -122,6 +123,6 @@ public class MovieServiceImpl implements MovieService {
             throw new MovieException("JSON 처리 오류 : " + e.getMessage());
         }
 
-        return list;
+        return new SearchResult(list, totalPages);
     }
 }

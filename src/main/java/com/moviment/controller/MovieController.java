@@ -1,18 +1,17 @@
 package com.moviment.controller;
 
-import com.moviment.exception.MovieException;
+import com.moviment.dto.SearchResult;
 import com.moviment.model.MovieVO;
 import com.moviment.service.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-@RestController
+@Controller
 @RequestMapping("/api")
 public class MovieController {
 
@@ -24,17 +23,25 @@ public class MovieController {
     }
 
     @GetMapping("/search")
-    @ResponseBody
-    public List<MovieVO> search(@ModelAttribute("message") String message, String keyword, Model model) {
-        if(message != null && !message.isEmpty()) {
-            //model.addAttribute("message", message);
-            throw new MovieException(message);
-        }
+    //@ResponseBody
+    public String search(@ModelAttribute("message") String message, @RequestParam(defaultValue = "1") int page, String keyword, Model model) {
+        SearchResult searchResult = movieService.searchMovies(keyword, model);
 
-        List<MovieVO> movieList = movieService.searchMovies(keyword, model);
-        model.addAttribute("movieList", movieList);
+        List<MovieVO> movieList = searchResult.getMovieVOList();
+        int totalPages = searchResult.getTotalPages(); // 전체 페이지 수
+
+        // 20개씩 끊어서 보여주기
+        int startIndex = (page - 1) * 20; // List 인덱스 start
+        int endIndex = Math.min(startIndex + 20, movieList.size()); // List 인덱스 end
+
+        List<MovieVO> paginatedMovieList = movieList.subList(startIndex, endIndex); // start 부터 end 까지의 List
+
+
+        model.addAttribute("movieList", paginatedMovieList);
         model.addAttribute("keyword", keyword);
-        return movieList;
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPage", totalPages);
+        return "searchResults";
     }
 
     @GetMapping("/board")

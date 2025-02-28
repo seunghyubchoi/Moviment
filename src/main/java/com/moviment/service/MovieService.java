@@ -1,10 +1,11 @@
 package com.moviment.service;
 
+import com.moviment.dto.SearchResult;
 import com.moviment.model.MovieVO;
 import org.springframework.ui.Model;
 
 import java.util.List;
 
 public interface MovieService {
-    List<MovieVO> searchMovies(String keyword, Model model);
+    SearchResult searchMovies(String keyword, Model model);
 }
