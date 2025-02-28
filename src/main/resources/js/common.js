@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function() {
     loginValidation(); // 로그인 폼 검증
     onSelectMenu(); // 메뉴 클릭 시 AJAX로 content 변경
     onSearchMovie(); // 영화 검색 기능
+    onSelectSearchMoviePageNumber(); // 영화 페이지 변경
 });
 
 // 로그인 폼 검증
@@ -55,19 +56,6 @@ function onSelectMenu() {
     });
 }
 
-// 메뉴 실행 시 자동 실행할 함수
-function initContentPage(contentPage) {
-    console.log(contentPage);
-    fetch("/api/" + contentPage)
-        .then(response => {
-            if(!response.ok) {
-                alert("받은 것 없음");
-            } else {
-                console.log(response.json());
-            }
-        })
-}
-
 function onSearchMovie() {
     let searchForm = document.getElementById("searchForm");
     if(searchForm) {
@@ -77,32 +65,42 @@ function onSearchMovie() {
             let keyword = document.getElementById("keyword").value;
             fetch("/api/search?keyword=" + encodeURIComponent(keyword))
                 .then(response => {
-                    return response.json().then(result => {
-                        if(!response.ok) {
+                    if(response.ok) {
+                        return response.text();
+                    } else {
+                        return response.json().then(result => {
                             return Promise.reject(result.message);
-                        } else {
-                            return result;
-                        }
-                    })
+                        })
+                    }
                 })
                 .then(data => {
-                    let searchResult = document.getElementById("searchResults");
-                    searchResult.innerHTML = ""; // 기존 내용 초기화
-
-                    console.log("data");
-                    console.log(data);
-
-                    if(data && data.length > 0) {
-
-                        let resultHtml = "<ul>";
-                        data.forEach(movie => {
-                            resultHtml += `<li>${movie.title}</li>`;
-                        });
-                        resultHtml += "</ul>";
-                        searchResult.innerHTML = resultHtml;
-                    }
+                    document.getElementById("searchResults").innerHTML = data;
+                    onSelectSearchMoviePageNumber();
                 })
                 .catch(error => alert(error));
         });
+    }
+}
+
+function onSelectSearchMoviePageNumber() {
+    let searchResults = document.getElementById("searchResults");
+    if(searchResults) {
+        document.querySelectorAll(".page-link").forEach(pageNumber => {
+            pageNumber.addEventListener("click", function(event) {
+                event.preventDefault();
+
+                const keyword = this.getAttribute("data-content");
+                const number = this.getAttribute("data-page");
+
+                fetch("/api/search?keyword=" + encodeURIComponent(keyword) + "&page=" + number)
+                    .then(response => response.text())
+                    .then(data => {
+                        document.getElementById("searchResults").innerHTML = data;
+                        onSelectSearchMoviePageNumber();
+                    })
+                    .catch(error => console.error("AJAX 오류:", error));
+            });
+        });
+
     }
 }
