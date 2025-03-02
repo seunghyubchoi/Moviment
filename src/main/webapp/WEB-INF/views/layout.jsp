@@ -4,39 +4,56 @@
 <html>
 <head>
     <title>Moviment</title>
-
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
-
-
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { display: flex; height: 100vh; }
-        .menu { width: 20%; background: #f4f4f4; padding: 20px; }
-        .content { width: 60%; padding: 20px; }
-        .chat { width: 20%; background: #ddd; padding: 20px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+            height: 100%;
+        }
+        .menu-link.active {
+            background-color: black !important;
+            color: white !important;
+        }
+        /* ✅ 기본 footer 스타일 */
+        footer {
+            background-color: #222;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            width: 100%;
+        }
     </style>
 </head>
-<body>
+<body class="d-flex flex-column vh-100">
+<div class="container-fluid h-100">
+    <div class="row h-100">
+        <!-- 좌측 메뉴 -->
+        <aside class="col-md-2 bg-light p-3">
+            <jsp:include page="menu.jsp"/>
+        </aside>
 
-<!-- 좌측 메뉴 -->
-<div class="menu">
-    <jsp:include page="menu.jsp"/>
-</div>
+        <!-- 메인 컨텐츠 -->
+        <main class="col-md-8 p-3" id="content">
+            <jsp:include page="main.jsp"/>
+        </main>
 
-<!-- 메인 컨텐츠 -->
-<div class="content" id="content">
-    <jsp:include page="main.jsp"/>
-</div>
-
-<!-- 우측 채팅 -->
-<div class="chat">
-    <jsp:include page="chat.jsp"/>
+        <!-- 우측 채팅 -->
+        <aside class="col-md-2 bg-secondary text-white p-3">
+            <jsp:include page="chat.jsp"/>
+        </aside>
+    </div>
 </div>
 
 <!-- footer -->
-<div class="footer">
+<footer class="bg-dark text-white text-center py-3">
     <jsp:include page="footer.jsp"/>
-</div>
+</footer>
 
 </body>
 </html>

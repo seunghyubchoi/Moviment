@@ -2,36 +2,58 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <style>
-    .movie-container ul {
+    .movie-container {
         display: flex;
         flex-wrap: wrap;
-        gap: 10px; /* 이미지 간격 */
-        padding: 0; /* 리스트 기본 패딩 제거 */
-        justify-content: center; /* 중앙 정렬 */
+        gap: 15px; /* 영화 카드 간격 */
+        justify-content: center;
+        min-height: 400px; /* ✅ 최소 높이 설정하여 footer와 겹치지 않도록 함 */
+        margin-bottom: 50px; /* ✅ 페이지네이션과 간격 추가 */
     }
 
-    .movie-container ul li {
-        list-style-type: none; /* 불렛포인트 제거 */
-        margin: 5px;
+    .movie-card {
+        width: 150px; /* 카드 크기 */
+        text-align: center;
+        background: #fff;
+        padding: 10px;
+        border-radius: 8px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .movie-card img {
+        width: 100%;
+        border-radius: 6px;
+    }
+
+    .page-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px; /* ✅ footer와의 간격 조정 */
+        padding-bottom: 20px;
     }
 </style>
 
 <c:if test="${not empty movieList}">
     <div class="movie-container" id="movie-container">
-        <ul>
-            <c:forEach var="movie" items="${movieList}">
-                <li>
-                    <img src="https://image.tmdb.org/t/p/w500${movie.posterPath}" style="width: 80px" alt="${movie.title}">
-                    <input type="hidden" name="movieId" value="${movie.id}">
-                </li>
-            </c:forEach>
-        </ul>
-    </div>
-
-    <div class="page-container">
-        <c:forEach var="i" begin="1" end="${totalPage}">
-            <a href="#" class="page-link" data-page="${i}" data-content="${keyword}">${i}</a>
+        <c:forEach var="movie" items="${movieList}">
+            <div class="movie-card">
+                <img src="https://image.tmdb.org/t/p/w500${movie.posterPath}" alt="${movie.title}">
+                <p class="fw-bold">${movie.title}</p>
+                <input type="hidden" name="movieId" value="${movie.id}">
+            </div>
         </c:forEach>
     </div>
-</c:if>
 
+    <!-- 페이지네이션 -->
+    <div class="page-container">
+        <nav>
+            <ul class="pagination">
+                <c:forEach var="i" begin="1" end="${totalPage}">
+                    <li class="page-item">
+                        <a href="#" class="page-link" data-page="${i}" data-content="${keyword}">${i}</a>
+                    </li>
+                </c:forEach>
+            </ul>
+        </nav>
+    </div>
+</c:if>
