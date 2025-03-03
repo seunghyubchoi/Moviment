@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.moviment.mapper.MovieMapper">
+
+    <!-- 영화 정보 추가 -->
+    <insert id="saveMovie">
+        <![CDATA[
+            INSERT INTO MOVIES VALUES (#{id}, #{title}, #{overview}, #{posterPath}, #{releaseDate}, #{popularity}, #{voteAverage})
+        ]]>
+    </insert>
+
+    <!-- 영화 검색 -->
+    <select id="findMovieById" resultType="movie">
+        <![CDATA[
+            SELECT ID
+                 , TITLE
+                 , OVERVIEW
+                 , POSTER_PATH
+                 , RELEASE_DATE AS RELEASEDATE
+                 , POPULARITY
+                 , VOTE_AVERAGE AS VOTEAVERAGE
+              FROM MOVIES
+             WHERE ID = #{id}
+        ]]>
+    </select>
+
+</mapper>

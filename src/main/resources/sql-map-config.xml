@@ -7,11 +7,13 @@
     <!-- Alias 설정 -->
     <typeAliases>
         <typeAlias alias="user" type="com.moviment.model.UserVO" />
+        <typeAlias alias="movie" type="com.moviment.model.MovieVO" />
     </typeAliases>
 
     <!-- Sql Mapper 설정 -->
     <mappers>
         <mapper resource="mappings/user-mapping.xml" />
+        <mapper resource="mappings/movie-mapping.xml" />
     </mappers>
 
 </configuration>
