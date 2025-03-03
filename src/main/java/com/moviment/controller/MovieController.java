@@ -23,7 +23,6 @@ public class MovieController {
     }
 
     @GetMapping("/search")
-    //@ResponseBody
     public String search(@ModelAttribute("message") String message, @RequestParam(defaultValue = "1") int page, String keyword, Model model) {
         SearchResult searchResult = movieService.searchMovies(keyword, model);
 
@@ -44,8 +43,11 @@ public class MovieController {
         return "searchResults";
     }
 
-    @GetMapping("/board")
-    public void boardTest() {
-        System.out.println("board 테스트!!!!");
+    @GetMapping("/searchDetail")
+    public String searchDetail(String id, Model model) {
+        MovieVO movieDetail = movieService.searchDetail(id, model);
+        model.addAttribute("movieDetail", movieDetail);
+
+        return "searchResults";
     }
 }

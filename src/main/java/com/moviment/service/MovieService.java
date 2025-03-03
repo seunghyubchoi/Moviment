@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface MovieService {
     SearchResult searchMovies(String keyword, Model model);
+    MovieVO searchDetail(String id, Model model);
 }
