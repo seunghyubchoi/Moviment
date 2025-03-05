@@ -2,6 +2,7 @@ package com.moviment.repository;
 
 import com.moviment.mapper.MovieMapper;
 import com.moviment.model.MovieVO;
+import com.moviment.model.ReviewVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -16,12 +17,17 @@ public class MovieMybatisRepository implements MovieRepository {
     }
 
     @Override
-    public MovieVO findMovieById(String id) {
+    public MovieVO findMovieById(int id) {
         return movieMapper.findMovieById(id);
     }
 
     @Override
     public void saveMovie(MovieVO movie) {
         movieMapper.saveMovie(movie);
+    }
+
+    @Override
+    public void addReview(ReviewVO review) {
+        movieMapper.addReview(review);
     }
 }

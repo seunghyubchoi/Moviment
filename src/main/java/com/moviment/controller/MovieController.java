@@ -2,7 +2,9 @@ package com.moviment.controller;
 
 import com.moviment.dto.SearchResult;
 import com.moviment.model.MovieVO;
+import com.moviment.model.ReviewVO;
 import com.moviment.service.MovieService;
+import oracle.jdbc.proxy.annotation.Post;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,7 +24,7 @@ public class MovieController {
         this.movieService = movieService;
     }
 
-    @GetMapping("/search")
+    @GetMapping("/movies")
     public String search(@ModelAttribute("message") String message, @RequestParam(defaultValue = "1") int page, String keyword, Model model) {
         SearchResult searchResult = movieService.searchMovies(keyword, model);
 
@@ -43,11 +45,19 @@ public class MovieController {
         return "searchResults";
     }
 
-    @GetMapping("/searchDetail")
-    public String searchDetail(String id, Model model) {
+    @GetMapping("/movies/{id}")
+    public String searchDetail(@PathVariable int id, Model model) {
         MovieVO movieDetail = movieService.searchDetail(id, model);
+        System.out.println("movieDetail = " + movieDetail);
         model.addAttribute("movieDetail", movieDetail);
+        System.out.println(model);
 
+        return "searchResults";
+    }
+
+    @PostMapping("/addReview")
+    public String addReview(@RequestBody ReviewVO review, Model model) {
+        movieService.addReview(review);
         return "searchResults";
     }
 }

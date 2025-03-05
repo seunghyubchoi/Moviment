@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moviment.dto.SearchResult;
 import com.moviment.exception.MovieException;
 import com.moviment.model.MovieVO;
+import com.moviment.model.ReviewVO;
 import com.moviment.repository.MovieRepository;
 import com.moviment.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -125,7 +126,8 @@ public class MovieServiceImpl implements MovieService {
                             result.get("popularity").asText(),
                             result.get("poster_path").asText(),
                             result.get("release_date").asText(),
-                            result.get("vote_average").asText()
+                            result.get("vote_average").asText(),
+                            null
                     );
                     list.add(movieVO);
                 }
@@ -140,7 +142,7 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public MovieVO searchDetail(String id, Model model) {
+    public MovieVO searchDetail(int id, Model model) {
         // DB에 해당 ID의 영화 정보가 있는지 검색
         MovieVO movieVO = movieRepository.findMovieById(id);
 
@@ -184,7 +186,8 @@ public class MovieServiceImpl implements MovieService {
                         results.get("popularity").asText(),
                         results.get("poster_path").asText(),
                         results.get("release_date").asText(),
-                        results.get("vote_average").asText()
+                        results.get("vote_average").asText(),
+                        null
                 );
 
                 System.out.println(movieVO);
@@ -197,5 +200,10 @@ public class MovieServiceImpl implements MovieService {
                 throw new MovieException(e.getMessage());
             }
         }
+    }
+
+    @Override
+    public void addReview(ReviewVO review) {
+        movieRepository.addReview(review);
     }
 }
