@@ -11,18 +11,53 @@
         ]]>
     </insert>
 
+    <!-- 영화 정보 추가 -->
+    <insert id="addReview">
+        <![CDATA[
+            INSERT INTO REVIEWS VALUES (#{id}, #{user_id}, #{movie_id}, #{content}, SYSDATE)
+        ]]>
+    </insert>
+
+    <!-- ReviewVO 전용 ResultMap -->
+    <resultMap id="reviewResultMap" type="com.moviment.model.ReviewVO">
+        <id property="id" column="REVIEWID"/>
+        <result property="userId" column="USERID"/>
+        <result property="content" column="CONTENT"/>
+        <result property="createdAt" column="CREATEDAT"/>
+    </resultMap>
+
+    <!-- MovieVO ResultMap -->
+    <resultMap id="movieResultMap" type="com.moviment.model.MovieVO">
+        <id property="id" column="MOVIE_ID"/>
+        <result property="title" column="TITLE"/>
+        <result property="overview" column="OVERVIEW"/>
+        <result property="posterPath" column="POSTERPATH"/>
+        <result property="releaseDate" column="RELEASEDATE"/>
+        <result property="popularity" column="POPULARITY"/>
+        <result property="voteAverage" column="VOTEAVERAGE"/>
+
+        <!-- 댓글 리스트 매핑 (resultMap 사용) -->
+        <collection property="review" resultMap="reviewResultMap"/>
+    </resultMap>
+
     <!-- 영화 검색 -->
     <select id="findMovieById" resultType="movie">
         <![CDATA[
-            SELECT ID
-                 , TITLE
-                 , OVERVIEW
-                 , POSTER_PATH
-                 , RELEASE_DATE AS RELEASEDATE
-                 , POPULARITY
-                 , VOTE_AVERAGE AS VOTEAVERAGE
-              FROM MOVIES
-             WHERE ID = #{id}
+            SELECT T1.ID
+                 , T1.TITLE
+                 , T1.OVERVIEW
+                 , T1.POSTER_PATH AS POSTERPATH
+                 , TO_CHAR(T1.RELEASE_DATE, 'YYYY-MM-DD') AS RELEASEDATE
+                 , T1.POPULARITY
+                 , T1.VOTE_AVERAGE AS VOTEAVERAGE
+                 , T2.ID AS REVIEWID
+                 , T2.MOVIE_ID
+                 , T2.USER_ID AS USERID
+                 , T2.CONTENT
+                 , TO_CHAR(T2.CREATED_AT, 'YYYY-MM-DD HH24:MI:SS') AS CREATEDAT
+              FROM MOVIES T1
+              LEFT JOIN REVIEWS T2 ON T1.ID = T2.MOVIE_ID
+             WHERE T1.ID = #{id}
         ]]>
     </select>
 
