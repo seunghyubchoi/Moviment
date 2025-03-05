@@ -1,7 +1,8 @@
 package com.moviment.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -16,4 +17,5 @@ public class MovieVO { // TMDB API
     private String posterPath;
     private String releaseDate;
     private String voteAverage;
+    private List<ReviewVO> reviews;
 }
