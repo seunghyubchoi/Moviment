@@ -7,18 +7,14 @@ import com.moviment.exception.MovieException;
 import com.moviment.model.MovieVO;
 import com.moviment.model.ReviewVO;
 import com.moviment.repository.MovieRepository;
-import com.moviment.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class MovieServiceImpl implements MovieService {
@@ -203,7 +199,8 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public void addReview(ReviewVO review) {
-        movieRepository.addReview(review);
+    public void addReview(String userId, ReviewVO review) {
+
+        movieRepository.addReview(userId, review);
     }
 }

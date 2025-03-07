@@ -8,5 +8,5 @@ import org.apache.ibatis.annotations.Mapper;
 public interface MovieMapper {
     MovieVO findMovieById(int id);
     void saveMovie(MovieVO movie);
-    void addReview(ReviewVO review);
+    void addReview(String userId, ReviewVO review);
 }

@@ -6,5 +6,5 @@ import com.moviment.model.ReviewVO;
 public interface MovieRepository {
     MovieVO findMovieById(int id);
     void saveMovie(MovieVO movie);
-    void addReview(ReviewVO review);
+    void addReview(String userId, ReviewVO review);
 }

@@ -27,7 +27,7 @@ public class MovieMybatisRepository implements MovieRepository {
     }
 
     @Override
-    public void addReview(ReviewVO review) {
-        movieMapper.addReview(review);
+    public void addReview(String userId, ReviewVO review) {
+        movieMapper.addReview(userId, review);
     }
 }

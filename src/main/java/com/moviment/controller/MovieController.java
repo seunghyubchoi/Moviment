@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,8 +57,9 @@ public class MovieController {
     }
 
     @PostMapping("/addReview")
-    public String addReview(@RequestBody ReviewVO review, Model model) {
-        movieService.addReview(review);
+    public String addReview(HttpSession session, @RequestBody ReviewVO review, Model model) {
+        String userId = (String) session.getAttribute("userId");
+        movieService.addReview(userId, review);
         return "searchResults";
     }
 }
