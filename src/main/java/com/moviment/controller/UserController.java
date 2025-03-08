@@ -45,6 +45,7 @@ public class UserController {
     public String login(UserVO user, Model model, BindingResult result, HttpSession session) {
         UserVO loginUser = userService.getUser(user, model, result);
         // 로그인 성공 시 세션에 사용자 정보 저장
+        session.setAttribute("user", loginUser);
         session.setAttribute("userId", loginUser.getId());
         session.setAttribute("userEmail", loginUser.getEmail());
         session.setAttribute("userName", loginUser.getUsername());
