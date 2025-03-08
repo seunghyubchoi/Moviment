@@ -6,6 +6,7 @@ import com.moviment.dto.SearchResult;
 import com.moviment.exception.MovieException;
 import com.moviment.model.MovieVO;
 import com.moviment.model.ReviewVO;
+import com.moviment.model.UserVO;
 import com.moviment.repository.MovieRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -199,8 +200,8 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public void addReview(String userId, ReviewVO review) {
+    public void addReview(UserVO user, ReviewVO review) {
 
-        movieRepository.addReview(userId, review);
+        movieRepository.addReview(user, review);
     }
 }

@@ -3,6 +3,7 @@ package com.moviment.controller;
 import com.moviment.dto.SearchResult;
 import com.moviment.model.MovieVO;
 import com.moviment.model.ReviewVO;
+import com.moviment.model.UserVO;
 import com.moviment.service.MovieService;
 import oracle.jdbc.proxy.annotation.Post;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,8 +59,8 @@ public class MovieController {
 
     @PostMapping("/addReview")
     public String addReview(HttpSession session, @RequestBody ReviewVO review, Model model) {
-        String userId = (String) session.getAttribute("userId");
-        movieService.addReview(userId, review);
+        UserVO user = (UserVO) session.getAttribute("user");
+        movieService.addReview(user, review);
         return "searchResults";
     }
 }
