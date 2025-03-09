@@ -11,6 +11,7 @@ import com.moviment.repository.MovieRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.client.RestTemplate;
 
@@ -36,33 +37,7 @@ public class MovieServiceImpl implements MovieService {
         String endPoint = "/search/movie?query=";
         String language = "&language=ko";
         String urlString = null;
-        //String urlString = baseUrl + endPoint + keyword + language;
-        //System.out.println(urlString);
 
-        // HttpURLConnection
-        /*
-        try {
-            URL url = new URL(urlString);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
-            conn.setRequestMethod("GET"); // GET method
-            conn.setRequestProperty("Accept", "application/json");
-            conn.setRequestProperty("Authorization", "Bearer " + apiKey);
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String line;
-            StringBuilder response = new StringBuilder();
-            while ((line = reader.readLine()) != null) {
-                response.append(line);
-            }
-            reader.close();
-
-            System.out.println("Response : " + response);
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        */
         // RestTemplate
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -75,7 +50,6 @@ public class MovieServiceImpl implements MovieService {
         int totalPages = 1;
 
         try {
-
             while (currentPage <= totalPages && currentPage <= 500) {
                 urlString = baseUrl + endPoint + keyword + language + "&page=" + currentPage;
                 System.out.println("요청 url : " + urlString);
@@ -139,6 +113,7 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
+    @Transactional
     public MovieVO searchDetail(int id, Model model) {
         // DB에 해당 ID의 영화 정보가 있는지 검색
         MovieVO movieVO = movieRepository.findMovieById(id);
@@ -174,7 +149,6 @@ public class MovieServiceImpl implements MovieService {
                 ObjectMapper objectMapper = new ObjectMapper();
 
                 JsonNode results = objectMapper.readTree(response.getBody()); // 응답 데이터
-                System.out.println(results.toString());
 
                 movieVO = new MovieVO(
                         results.get("id").asInt(),
@@ -187,10 +161,8 @@ public class MovieServiceImpl implements MovieService {
                         null
                 );
 
-                System.out.println(movieVO);
-
                 // DB 해당 MovieVO 정보 저장
-                movieRepository.saveMovie(movieVO);
+                movieRepository.saveMovie(movieVO); // @Transactional
 
                 return movieVO;
             } catch (Exception e) {
@@ -200,21 +172,25 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
+    @Transactional
     public List<ReviewVO> searchReview(int id) {
         return movieRepository.searchReview(id);
     }
 
     @Override
+    @Transactional
     public void addReview(UserVO user, ReviewVO review) {
         movieRepository.addReview(user, review);
     }
 
     @Override
+    @Transactional
     public void deleteReview(ReviewVO review) {
         movieRepository.deleteReview(review);
     }
 
     @Override
+    @Transactional
     public void patchReview(ReviewVO review) {
         movieRepository.patchReview(review);
     }

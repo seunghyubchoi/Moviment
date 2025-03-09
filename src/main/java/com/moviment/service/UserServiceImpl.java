@@ -6,6 +6,7 @@ import com.moviment.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
@@ -34,6 +35,7 @@ public class UserServiceImpl implements UserService {
      * @param user
      */
     @Override
+    @Transactional
     public void saveUser(UserVO user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.saveUser(user);
@@ -47,6 +49,7 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     @Override
+    @Transactional
     public UserVO getUser(UserVO user, Model model, BindingResult result) {
         // 이메일 검증
         UserVO savedUser = findByUserEmail(user.getEmail());
