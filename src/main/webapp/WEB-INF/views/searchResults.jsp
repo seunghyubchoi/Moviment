@@ -173,10 +173,21 @@
 
         <div class="review-list">
             <h3>댓글 목록</h3>
-            <c:forEach var="reivew" items="${movieDetail.reviews}">
+            <c:forEach var="review" items="${reviewList}">
                 <div class="review">
-                    <p><strong>${reivew.userId}</strong>: ${reivew.content}</p>
-                    <p class="review-date">${reivew.createdAt}</p>
+                    <p><strong>${review.userName}</strong>: ${review.content}</p>
+                    <p class="review-date">${review.createdAt}</p>
+
+                    <c:if test="${sessionScope.userId eq review.userId}">
+                        <div>
+                            <button class="btn btn-sm btn-primary me-2" onclick="patchReview(${review.id})">
+                                <i class="bi bi-pencil"></i> 수정
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteReview(${review.id})">
+                                <i class="bi bi-trash"></i> 삭제
+                            </button>
+                        </div>
+                    </c:if>
                 </div>
             </c:forEach>
         </div>

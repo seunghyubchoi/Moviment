@@ -155,12 +155,12 @@ function onLoadMovieInfo(movieId) {
         .then(response => response.text())
         .then(data => {
             document.getElementById("searchResults").innerHTML = data;
-            onSelectSearchMoviePageNumber();
             addReview();
         })
         .catch(error => console.error("AJAX 오류:", error));
 }
 
+// 댓글 추가
 function addReview() {
     let addReview = document.getElementById("addReview");
     if(addReview) {
@@ -170,14 +170,12 @@ function addReview() {
             const movieId = document.getElementById("movieId").value;
             const reviewContent = document.getElementById("reviewContent").value;
 
-            console.log(movieId);
-
             if (!reviewContent.trim()) {
                 alert("댓글을 입력하세요.");
                 return;
             }
 
-            let response = await fetch("/api/addReview", {
+            let response = await fetch("/api/review", {
                 method: "POST"
                 , headers: {
                     "Content-Type": "application/json"
@@ -195,5 +193,33 @@ function addReview() {
                 alert("댓글 등록에 실패했습니다.")
             }
         });
+    }
+}
+// 댓글 수정
+function patchReview(reviewId) {
+    const movieId = document.getElementById("movieId").value;
+    let newContent = prompt("수정할 내용을 입력하세요:");
+    if (newContent !== null && newContent.trim() !== "") {
+        let response = fetch(`/api/review`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: reviewId, content: newContent })
+        });
+        document.getElementById("searchResults").value = ""; // 입력창 초기화
+        onLoadMovieInfo(movieId);
+    }
+}
+// 댓글 삭제
+function deleteReview(reviewId) {
+    const movieId = document.getElementById("movieId").value;
+    if(confirm("댓글을 삭제하시겠습니까?")) {
+        let response = fetch(`/api/review`, {
+            method: "DELETE"
+            , headers: {"Content-Type" : "application/json"}
+            , body: JSON.stringify({id: reviewId})
+        })
+        document.getElementById("searchResults").value = ""; // 입력창 초기화
+        onLoadMovieInfo(movieId);
+
     }
 }

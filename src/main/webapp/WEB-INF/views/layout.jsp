@@ -51,9 +51,11 @@
 </div>
 
 <!-- footer -->
+<%--
 <footer class="bg-dark text-white text-center py-3">
     <jsp:include page="footer.jsp"/>
 </footer>
+--%>
 
 </body>
 </html>
