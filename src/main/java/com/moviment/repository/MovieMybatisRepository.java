@@ -7,6 +7,8 @@ import com.moviment.model.UserVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public class MovieMybatisRepository implements MovieRepository {
 
@@ -30,5 +32,20 @@ public class MovieMybatisRepository implements MovieRepository {
     @Override
     public void addReview(UserVO user, ReviewVO review) {
         movieMapper.addReview(user, review);
+    }
+
+    @Override
+    public List<ReviewVO> searchReview(int id) {
+        return movieMapper.searchReview(id);
+    }
+
+    @Override
+    public void deleteReview(ReviewVO review) {
+        movieMapper.deleteReview(review);
+    }
+
+    @Override
+    public void patchReview(ReviewVO review) {
+        movieMapper.patchReview(review);
     }
 }

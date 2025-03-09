@@ -50,17 +50,32 @@ public class MovieController {
     @GetMapping("/movies/{id}")
     public String searchDetail(@PathVariable int id, Model model) {
         MovieVO movieDetail = movieService.searchDetail(id, model);
-        System.out.println("movieDetail = " + movieDetail);
-        model.addAttribute("movieDetail", movieDetail);
-        System.out.println(model);
+        List<ReviewVO> reviewList = movieService.searchReview(id);
 
+        model.addAttribute("movieDetail", movieDetail); // 영화 상세 페이지 모델 내 추가
+
+        if(reviewList != null) {
+            model.addAttribute("reviewList", reviewList); // 댓글 있는 경우 추가
+        }
         return "searchResults";
     }
 
-    @PostMapping("/addReview")
+    @PostMapping("/review")
     public String addReview(HttpSession session, @RequestBody ReviewVO review, Model model) {
         UserVO user = (UserVO) session.getAttribute("user");
         movieService.addReview(user, review);
+        return "searchResults";
+    }
+
+    @DeleteMapping("/review")
+    public String deleteReview(@RequestBody ReviewVO review) {
+        movieService.deleteReview(review);
+        return "searchResults";
+    }
+
+    @PatchMapping("/review")
+    public String patchReview(@RequestBody ReviewVO review) {
+        movieService.patchReview(review);
         return "searchResults";
     }
 }

@@ -13,4 +13,6 @@ public class ReviewVO {
     private String movieId;
     private String content;
     private String createdAt;
+    private String userEmail;
+    private String userName;
 }

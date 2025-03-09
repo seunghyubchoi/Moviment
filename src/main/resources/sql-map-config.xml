@@ -8,6 +8,7 @@
     <typeAliases>
         <typeAlias alias="user" type="com.moviment.model.UserVO" />
         <typeAlias alias="movie" type="com.moviment.model.MovieVO" />
+        <typeAlias alias="review" type="com.moviment.model.ReviewVO" />
     </typeAliases>
 
     <!-- Sql Mapper 설정 -->

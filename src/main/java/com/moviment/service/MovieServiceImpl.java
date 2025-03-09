@@ -200,8 +200,22 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public void addReview(UserVO user, ReviewVO review) {
+    public List<ReviewVO> searchReview(int id) {
+        return movieRepository.searchReview(id);
+    }
 
+    @Override
+    public void addReview(UserVO user, ReviewVO review) {
         movieRepository.addReview(user, review);
+    }
+
+    @Override
+    public void deleteReview(ReviewVO review) {
+        movieRepository.deleteReview(review);
+    }
+
+    @Override
+    public void patchReview(ReviewVO review) {
+        movieRepository.patchReview(review);
     }
 }
