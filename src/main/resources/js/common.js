@@ -7,9 +7,16 @@ window.onload = function () {
     registerValidation(); // 회원가입 폼 검증
 };
 
+window.addEventListener("popstate", function (event) {
+    if (event.state) {
+        loadContentPage(event.state.type, false); // AJAX로 이전 상태의 페이지 불러오기
+    }
+});
+
+
+// DOM 로드 시 준비되는 함수들
 document.addEventListener("DOMContentLoaded", function() {
     loginValidation(); // 로그인 폼 검증
-    //registerValidation(); // 회원가입 폼 검증
     onSelectMenu(); // 메뉴 클릭 시 AJAX로 content 변경
     onSearchMovie(); // 영화 검색 기능
     onSelectSearchMoviePageNumber(); // 영화 페이지 변경
@@ -69,18 +76,7 @@ function onSelectMenu() {
             this.classList.add("active");
 
             const contentPage = this.getAttribute("data-content");
-            fetch("/loadContent?content=" + contentPage)
-                .then(response => response.text())
-                .then(html => {
-                    document.getElementById("content").innerHTML = html;
-
-                    // AJAX로 페이지 로드한 경우, 이벤트 리스너 재등록
-                    if(contentPage === "search") {
-                        onSearchMovie();
-                    }
-
-                })
-                .catch(error => console.error("AJAX 오류:", error));
+            loadContentPage(contentPage);
         });
     });
 }
@@ -122,7 +118,7 @@ function onSelectSearchMoviePageNumber() {
                 const keyword = this.getAttribute("data-content");
                 const number = this.getAttribute("data-page");
 
-                fetch("/api/search?keyword=" + encodeURIComponent(keyword) + "&page=" + number)
+                fetch("/api/movies?keyword=" + encodeURIComponent(keyword) + "&page=" + number)
                     .then(response => response.text())
                     .then(data => {
                         document.getElementById("searchResults").innerHTML = data;
@@ -222,4 +218,44 @@ function deleteReview(reviewId) {
         onLoadMovieInfo(movieId);
 
     }
+}
+
+function loadContentPage(contentPage, addToHistory = true) {
+    fetch("/loadContent?content=" + contentPage) // data-content jsp 반환
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById("content").innerHTML = html;
+
+            if (addToHistory) {
+                history.pushState({ type: contentPage }, "", ""); // URL은 그대로 유지
+            }
+
+            // AJAX로 페이지 로드한 경우, 이벤트 리스너 재등록
+            if(contentPage === "search") {
+                onSearchMovie();
+            } else if(contentPage === "board") {
+                onSearchBoard();
+            }
+
+        })
+        .catch(error => console.error("AJAX 오류:", error));
+}
+
+function onSearchBoard() {
+    fetch("/board")
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById("content").innerHTML = html;
+        })
+        .catch(error => console.error("게시판 로드 오류"));
+}
+
+function addBoard() {
+    let userId = document.getElementById("userId").value;
+    let boardContent = document.getElementById("boardContent").value;
+    fetch("/board", {
+        method: "POST"
+        , headers: {"Content-Type" : "application/json"}
+        , body: JSON.stringify({ userid: userId, content: boardContent })
+    })
 }
