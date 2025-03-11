@@ -1,5 +1,6 @@
 package com.moviment.exception;
 
+import org.apache.ibatis.annotations.Update;
 import org.apache.ibatis.logging.LogException;
 import org.springframework.http.HttpStatus;
 import org.springframework.ui.Model;
@@ -25,6 +26,19 @@ public class GlobalExceptionHandler {
     public String handleLoginException(LoginException e, RedirectAttributes redirectAttributes) {
         redirectAttributes.addFlashAttribute("message", e.getMessage());
         return "redirect:/";
+    }
+
+    /**
+     * 로그인 관련 예외 처리
+     * @param e
+     * @param model
+     * @return
+     */
+    @ExceptionHandler(UpdateUserInfoException.class)
+    public String handleUpdateUserInfoException(UpdateUserInfoException e, Model model) {
+        model.addAttribute("message", e.getMessage());
+        model.addAttribute("contentPage", "/WEB-INF/views/userInfo.jsp");
+        return "layout";
     }
 
     /**
