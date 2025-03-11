@@ -1,9 +1,12 @@
 package com.moviment.repository;
 
+import com.moviment.dto.UserInfoDTO;
 import com.moviment.mapper.UserMapper;
 import com.moviment.model.UserVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
+import javax.validation.Valid;
 
 @Repository
 public class UserMybatisRepository implements UserRepository {
@@ -33,5 +36,10 @@ public class UserMybatisRepository implements UserRepository {
     @Override
     public void updatePwdErrCnt(int errCnt, String userEmail) {
         userMapper.updatePwdErrCnt(errCnt, userEmail);
+    }
+
+    @Override
+    public void updateUserInfo(@Valid UserInfoDTO user) {
+        userMapper.updateUserInfo(user);
     }
 }

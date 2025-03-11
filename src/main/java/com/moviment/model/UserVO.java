@@ -29,6 +29,7 @@ public class UserVO {
     private String password;
 
     @NotBlank(message = "이름을 입력해주세요.")
+    @Size(min = 2, max = 8, message = "이름은 최소 2자 이상, 최대 8자까지 가능합니다.")
     private String username;
 
     private String auth_provider;

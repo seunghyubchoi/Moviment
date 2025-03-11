@@ -1,14 +1,18 @@
 package com.moviment.controller;
 
+import com.moviment.dto.UserInfoDTO;
 import com.moviment.model.UserVO;
 import com.moviment.service.UserService;
+import oracle.jdbc.proxy.annotation.Post;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpSession;
@@ -92,6 +96,23 @@ public class UserController {
         userService.saveUser(user);
         redirectAttributes.addFlashAttribute("message", "회원가입이 완료되었습니다! 가입한 아이디로 로그인하시기 바랍니다.");
         return "redirect:/";
+    }
+
+    @PostMapping("/updateUserInfo")
+    public String updateUserInfo(@Valid @ModelAttribute("user") UserInfoDTO user,
+                                 BindingResult result,
+                                 Model model,
+                                 RedirectAttributes redirectAttributes) {
+
+        if(result.hasErrors()) {
+            model.addAttribute("message", result.getAllErrors().get(0).getDefaultMessage());
+            model.addAttribute("contentPage", "/WEB-INF/views/userInfo.jsp");
+            return "layout";
+        }
+
+        userService.updateUserInfo(user);
+        redirectAttributes.addFlashAttribute("message", "비밀번호가 성공적으로 변경되었습니다.");
+        return "redirect:layout";
     }
 
 }

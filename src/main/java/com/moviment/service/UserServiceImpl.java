@@ -1,6 +1,8 @@
 package com.moviment.service;
 
+import com.moviment.dto.UserInfoDTO;
 import com.moviment.exception.LoginException;
+import com.moviment.exception.UpdateUserInfoException;
 import com.moviment.model.UserVO;
 import com.moviment.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+
+import javax.validation.Valid;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -53,7 +57,6 @@ public class UserServiceImpl implements UserService {
     public UserVO getUser(UserVO user, Model model, BindingResult result) {
         // 이메일 검증
         UserVO savedUser = findByUserEmail(user.getEmail());
-        System.out.println("savedUser = " + savedUser);
 
         if (savedUser == null) {
             // 아이디 혹은 비밀번호 중 어느 것이 맞는지 모르게 끔
@@ -67,7 +70,6 @@ public class UserServiceImpl implements UserService {
 
         if(!checkPassword(loginPassword, savedPassword)) {
             int pwdErrCnt = savedUser.getPwdErrCnt();
-            System.out.println(pwdErrCnt + "!!!!!!!!!!");
 
             if(pwdErrCnt >= 5) {
                 throw new LoginException("로그인 5회 실패로 로그인이 제한되었습니다. \n관리자에게 문의해주세요.");
@@ -77,6 +79,8 @@ public class UserServiceImpl implements UserService {
             throw new LoginException("아이디 또는 비밀번호를 확인해주세요.");
 
         }
+
+        userRepository.updatePwdErrCnt(0, user.getEmail());
 
         return savedUser;
     }
@@ -107,5 +111,19 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public void updateUserInfo(@Valid UserInfoDTO user) {
+        UserVO savedUser = findByUserEmail(user.getEmail());
+        boolean result = checkPassword(user.getCurrentPassword(), savedUser.getPassword());
+        if(!result) {
+            throw new UpdateUserInfoException("현재 비밀번호가 일치하지 않습니다.");
+        }
 
+        if(!user.getNewPassword().equals(user.getConfirmPassword())) {
+            throw new UpdateUserInfoException("새비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+        }
+        user.setCurrentPassword(passwordEncoder.encode(user.getNewPassword()));
+
+        userRepository.updateUserInfo(user);
+    }
 }

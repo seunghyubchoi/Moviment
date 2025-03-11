@@ -51,4 +51,14 @@
             WHERE EMAIL = #{userEmail}
          ]]>
     </update>
+
+    <!-- 회원 정보 업데이트 -->
+    <update id="updateUserInfo">
+        <![CDATA[
+           UPDATE USERS
+              SET PASSWORD = #{user.newPassword}
+                , USERNAME = #{user.username}
+            WHERE EMAIL = #{user.email}
+         ]]>
+    </update>
 </mapper>
