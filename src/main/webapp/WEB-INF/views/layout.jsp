@@ -4,31 +4,9 @@
 <html>
 <head>
     <title>Moviment</title>
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        html {
-            height: 100%;
-        }
-        .menu-link.active {
-            background-color: black !important;
-            color: white !important;
-        }
-        /* ✅ 기본 footer 스타일 */
-        footer {
-            background-color: #222;
-            color: white;
-            text-align: center;
-            padding: 15px;
-            width: 100%;
-        }
-    </style>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+    <script src="${pageContext.request.contextPath}/js/common.js"></script>
 </head>
 <body class="d-flex flex-column vh-100">
 <div class="container-fluid h-100">
@@ -40,22 +18,10 @@
 
         <!-- 메인 컨텐츠 -->
         <main class="col-md-8 p-3" id="content">
-            <jsp:include page="main.jsp"/>
+            <jsp:include page="${contentPage}"/>
         </main>
-
-        <!-- 우측 채팅 -->
-        <aside class="col-md-2 bg-secondary text-white p-3">
-            <jsp:include page="chat.jsp"/>
-        </aside>
     </div>
 </div>
-
-<!-- footer -->
-<%--
-<footer class="bg-dark text-white text-center py-3">
-    <jsp:include page="footer.jsp"/>
-</footer>
---%>
 
 </body>
 </html>
