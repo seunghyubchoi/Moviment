@@ -1,5 +1,6 @@
 package com.moviment.controller;
 
+import com.moviment.model.UserVO;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,28 @@ public class LayoutController {
     @GetMapping("/layout")
     public String layout(Model model) {
         model.addAttribute("contentPage", "main.jsp");
+        return "layout";
+    }
+
+    /**
+     * 회원정보수정
+     * @param model
+     * @return
+     */
+    @GetMapping("/userInfo")
+    public String userInfo(Model model) {
+        model.addAttribute("contentPage", "/WEB-INF/views/userInfo.jsp");
+        return "layout";
+    }
+
+    /**
+     * 즐겨찾기
+     * @param model
+     * @return
+     */
+    @GetMapping("/userFavorite")
+    public String userFavorite(Model model) {
+        model.addAttribute("contentPage", "/WEB-INF/views/userFavorite.jsp");
         return "layout";
     }
 
