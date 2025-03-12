@@ -122,7 +122,7 @@ public class UserServiceImpl implements UserService {
         if(!user.getNewPassword().equals(user.getConfirmPassword())) {
             throw new UpdateUserInfoException("새비밀번호와 비밀번호 확인이 일치하지 않습니다.");
         }
-        user.setCurrentPassword(passwordEncoder.encode(user.getNewPassword()));
+        user.setNewPassword(passwordEncoder.encode(user.getNewPassword()));
 
         userRepository.updateUserInfo(user);
     }
