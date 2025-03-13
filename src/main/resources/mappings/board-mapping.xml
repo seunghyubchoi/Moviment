@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.moviment.mapper.BoardMapper">
+    <!-- 회원 검색(로그인) -->
+    <select id="getBoardList" resultType="board">
+        <![CDATA[
+            SELECT ID
+                 , USER_ID AS USERID
+                 , CONTENT
+                 , VIEW_COUNT AS VIEWCOUNT
+                 , CREATED_AT AS CREATEDAT
+                 , TITLE
+              FROM BOARD
+        ]]>
+    </select>
+</mapper>
