@@ -1,5 +1,6 @@
 package com.moviment.repository;
 
+import com.moviment.dto.UserSessionDTO;
 import com.moviment.mapper.MovieMapper;
 import com.moviment.model.MovieVO;
 import com.moviment.model.ReviewVO;
@@ -30,7 +31,7 @@ public class MovieMybatisRepository implements MovieRepository {
     }
 
     @Override
-    public void addReview(UserVO user, ReviewVO review) {
+    public void addReview(UserSessionDTO user, ReviewVO review) {
         movieMapper.addReview(user, review);
     }
 

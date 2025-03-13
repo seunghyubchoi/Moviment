@@ -1,20 +1,21 @@
 package com.moviment.controller;
 
 import com.moviment.dto.SearchResult;
+import com.moviment.dto.UserSessionDTO;
 import com.moviment.model.MovieVO;
 import com.moviment.model.ReviewVO;
 import com.moviment.model.UserVO;
 import com.moviment.service.MovieService;
-import oracle.jdbc.proxy.annotation.Post;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Controller
 @RequestMapping("/api")
 public class MovieController {
@@ -62,7 +63,8 @@ public class MovieController {
 
     @PostMapping("/review")
     public String addReview(HttpSession session, @RequestBody ReviewVO review, Model model) {
-        UserVO user = (UserVO) session.getAttribute("user");
+        UserSessionDTO user = (UserSessionDTO) session.getAttribute("user");
+        log.info("user : {}", user);
         movieService.addReview(user, review);
         return "searchResults";
     }

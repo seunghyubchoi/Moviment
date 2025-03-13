@@ -3,11 +3,12 @@ package com.moviment.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moviment.dto.SearchResult;
+import com.moviment.dto.UserSessionDTO;
 import com.moviment.exception.MovieException;
 import com.moviment.model.MovieVO;
 import com.moviment.model.ReviewVO;
-import com.moviment.model.UserVO;
 import com.moviment.repository.MovieRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
-
+@Slf4j
 @Service
 public class MovieServiceImpl implements MovieService {
 
@@ -33,7 +34,6 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
         public SearchResult searchMovies(String keyword, Model model) {
-        System.out.println("MovieServiceImpl.search : " + keyword);
         String endPoint = "/search/movie?query=";
         String language = "&language=ko";
         String urlString = null;
@@ -52,7 +52,7 @@ public class MovieServiceImpl implements MovieService {
         try {
             while (currentPage <= totalPages && currentPage <= 500) {
                 urlString = baseUrl + endPoint + keyword + language + "&page=" + currentPage;
-                System.out.println("요청 url : " + urlString);
+                log.debug("요청 url : {}", urlString);
 
                 // 직렬화된 결과 (JSON)
                 HttpEntity<String> entity = new HttpEntity<String>(headers);
@@ -86,7 +86,7 @@ public class MovieServiceImpl implements MovieService {
                     if(totalPages >= 20) {
                         throw new MovieException("데이터가 많습니다. 검색어를 추가해주세요.");
                     }
-                    System.out.println("총 페이지 수: " + totalPages);
+                    log.debug("총 페이지 수: {}", totalPages);
                 }
 
                 for(JsonNode result : results) {
@@ -179,7 +179,7 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     @Transactional
-    public void addReview(UserVO user, ReviewVO review) {
+    public void addReview(UserSessionDTO user, ReviewVO review) {
         movieRepository.addReview(user, review);
     }
 
