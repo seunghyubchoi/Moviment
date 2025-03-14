@@ -3,7 +3,7 @@
 <form action="/updateUserInfo" method="post">
     <div>
         <h5>EMAIL</h5>
-        <input type="text" name="email" value="${sessionScope.userEmail}" readonly>
+        <input type="text" name="email" value="${sessionScope.user.email}" readonly>
     </div>
     <div>
         <h5>현재비밀번호</h5>
@@ -19,7 +19,7 @@
     </div>
     <div>
         <h5>이름</h5>
-        <input type="text" name="username" value="${sessionScope.userName}">
+        <input type="text" name="username" value="${sessionScope.user.username}">
     </div>
     <button type="submit">변경</button>
 </form>
