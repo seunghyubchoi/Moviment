@@ -1,73 +1,51 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
 <!-- Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <html>
 <head>
     <title>Moviment</title>
-    <style>
-        .form-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-        }
-        .form-box {
-            background: #fff;
-            padding: 30px;
-            border: 1px solid #ddd;
-            border-radius: 12px;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-            width: 350px;
-            text-align: center;
-        }
-        .input-group {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 10px;
-        }
-        .input-group label {
-            font-weight: bold;
-            min-width: 80px;
-            text-align: left;
-            margin-right: 10px;
-        }
-        .button-group {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 </head>
-<body>
-    <div class="container form-container">
-        <div class="form-box">
-            <h1>MOVIMENT</h1>
-            <br>
-            <form action="/login" method="post" id="loginForm">
-                <div class="input-group">
-                    <label class="form-label" for="email">E-mail</label>
-                    <input class="form-control" type="text" id="email" name="email">
+<body class="d-flex justify-content-center align-items-center vh-100 bg-light">
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-4">
+            <div class="card shadow p-4">
+                <div class="card-body text-center">
+                    <h1 class="fw-bold text-dark">MOVIMENT</h1>
+                    <br>
+                    <form action="/login" method="post" id="loginForm">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">E-mail</label>
+                            <input type="text" id="email" name="email" class="form-control" placeholder="이메일 입력">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">비밀번호</label>
+                            <input type="password" id="password" name="password" class="form-control" placeholder="비밀번호 입력">
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-dark">로그인</button>
+                            <a href="/register" class="btn btn-outline-secondary">회원가입</a>
+                        </div>
+                    </form>
                 </div>
-                <br>
-                <div class="input-group">
-                    <label class="form-label" for="password">비밀번호</label>
-                    <input class="form-control" type="password" id="password" name="password">
-                </div>
-                <div class="button-group">
-                    <button type="submit" class="btn btn-primary">로그인</button>
-                    <a href="/register" class="btn btn-secondary">회원가입</a>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
-    <script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
-    <script>
-        let serverMessage = "${message}";
-    </script>
+</div>
+
+<!-- Bootstrap JS & Custom JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="${pageContext.request.contextPath}/js/common.js"></script>
+<script>
+    let serverMessage = "${message}";
+</script>
+
 </body>
 </html>
