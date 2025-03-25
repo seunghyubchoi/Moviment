@@ -17,7 +17,7 @@ window.addEventListener("popstate", function (event) {
 // DOM 로드 시 준비되는 함수들
 document.addEventListener("DOMContentLoaded", function() {
     loginValidation(); // 로그인 폼 검증
-    onSelectMenu(); // 메뉴 클릭 시 AJAX로 content 변경
+    //onSelectMenu(); // 메뉴 클릭 시 AJAX로 content 변경
     onSearchMovie(); // 영화 검색 기능
     onSelectSearchMoviePageNumber(); // 영화 페이지 변경
 });
@@ -67,6 +67,7 @@ function registerValidation() {
 }
 
 // 메뉴 클릭 시 AJAX로 content 변경
+/*
 function onSelectMenu() {
     document.querySelectorAll(".menu-link").forEach(menuItem => {
         menuItem.addEventListener("click", function(event) {
@@ -80,6 +81,7 @@ function onSelectMenu() {
         });
     });
 }
+*/
 
 function onSearchMovie() {
     let searchForm = document.getElementById("searchForm");
