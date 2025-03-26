@@ -22,8 +22,11 @@ import java.util.List;
 @Service
 public class MovieServiceImpl implements MovieService {
 
-    private final String apiKey = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI0NmIzODFiYWZmZDVlMWJjNjQ3MWM1NzhhMGRlMmNkZCIsIm5iZiI6MTczOTI1NDM1Mi45NTIsInN1YiI6IjY3YWFlYTUwN2M5OTEwODE0ZjliOWEyZSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.pkH2ShDZuAAUGdq_FYntp-Xhy6u5b1DnSyeQ0IATohU";
-    private final String baseUrl = "https://api.themoviedb.org/3";
+    private static final String API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI0NmIzODFiYWZmZDVlMWJjNjQ3MWM1NzhhMGRlMmNkZCIsIm5iZiI6MTczOTI1NDM1Mi45NTIsInN1YiI6IjY3YWFlYTUwN2M5OTEwODE0ZjliOWEyZSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.pkH2ShDZuAAUGdq_FYntp-Xhy6u5b1DnSyeQ0IATohU";
+    private static final String BASE_URL = "https://api.themoviedb.org/3";
+    private static final RestTemplate REST_TEMPLATE = new RestTemplate();
+    private static final HttpHeaders HEADERS = new HttpHeaders();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private MovieRepository movieRepository;
 
@@ -39,10 +42,8 @@ public class MovieServiceImpl implements MovieService {
         String urlString = null;
 
         // RestTemplate
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Accept", "application/json");
-        headers.set("Authorization", "Bearer " + apiKey);
+        HEADERS.set("Accept", "application/json");
+        HEADERS.set("Authorization", "Bearer " + API_KEY);
 
         List<MovieVO> list = new ArrayList<>();
 
@@ -51,13 +52,13 @@ public class MovieServiceImpl implements MovieService {
 
         try {
             while (currentPage <= totalPages && currentPage <= 500) {
-                urlString = baseUrl + endPoint + keyword + language + "&page=" + currentPage;
+                urlString = BASE_URL + endPoint + keyword + language + "&page=" + currentPage;
                 log.debug("요청 url : {}", urlString);
 
                 // 직렬화된 결과 (JSON)
-                HttpEntity<String> entity = new HttpEntity<String>(headers);
+                HttpEntity<String> entity = new HttpEntity<String>(HEADERS);
 
-                ResponseEntity<String> response = restTemplate.exchange(urlString, HttpMethod.GET, entity, String.class);
+                ResponseEntity<String> response = REST_TEMPLATE.exchange(urlString, HttpMethod.GET, entity, String.class);
 
                 if(!response.getStatusCode().is2xxSuccessful()) {
                     throw new MovieException("TMDB API 호출 실패 : " + response.getStatusCode());
@@ -67,9 +68,7 @@ public class MovieServiceImpl implements MovieService {
                     throw new MovieException("TMDB API 응답이 비어 있습니다.");
                 }
 
-                ObjectMapper objectMapper = new ObjectMapper();
-
-                JsonNode rootResults = objectMapper.readTree(response.getBody()); // 응답 데이터
+                JsonNode rootResults = OBJECT_MAPPER.readTree(response.getBody()); // 응답 데이터
 
                 JsonNode totalResults = rootResults.get("total_results");
                 if(totalResults == null || totalResults.asInt() == 0) {
@@ -125,18 +124,16 @@ public class MovieServiceImpl implements MovieService {
             // 없으면 DB에 불러온 API 정보 INSERT
             String endPoint = "/movie/";
             String language = "?language=ko";
-            String urlString = baseUrl + endPoint + id + language;
+            String urlString = BASE_URL + endPoint + id + language;
 
             // RestTemplate
-            RestTemplate restTemplate = new RestTemplate();
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Accept", "application/json");
-            headers.set("Authorization", "Bearer " + apiKey);
+            HEADERS.set("Accept", "application/json");
+            HEADERS.set("Authorization", "Bearer " + API_KEY);
 
             try {
-                HttpEntity<String> entity = new HttpEntity<String>(headers);
+                HttpEntity<String> entity = new HttpEntity<String>(HEADERS);
 
-                ResponseEntity<String> response = restTemplate.exchange(urlString, HttpMethod.GET, entity, String.class);
+                ResponseEntity<String> response = REST_TEMPLATE.exchange(urlString, HttpMethod.GET, entity, String.class);
 
                 if (!response.getStatusCode().is2xxSuccessful()) {
                     throw new MovieException("TMDB API 호출 실패 : " + response.getStatusCode());
@@ -146,9 +143,7 @@ public class MovieServiceImpl implements MovieService {
                     throw new MovieException("TMDB API 응답이 비어 있습니다.");
                 }
 
-                ObjectMapper objectMapper = new ObjectMapper();
-
-                JsonNode results = objectMapper.readTree(response.getBody()); // 응답 데이터
+                JsonNode results = OBJECT_MAPPER.readTree(response.getBody()); // 응답 데이터
 
                 movieVO = new MovieVO(
                         results.get("id").asInt(),
@@ -193,5 +188,10 @@ public class MovieServiceImpl implements MovieService {
     @Transactional
     public void patchReview(ReviewVO review) {
         movieRepository.patchReview(review);
+    }
+
+    @Override
+    public void getListOfNowPlaying() {
+
     }
 }

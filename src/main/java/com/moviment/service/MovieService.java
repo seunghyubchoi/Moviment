@@ -15,4 +15,6 @@ public interface MovieService {
     void addReview(UserSessionDTO user, ReviewVO review);
     void deleteReview(ReviewVO review);
     void patchReview(ReviewVO review);
+
+    void getListOfNowPlaying();
 }

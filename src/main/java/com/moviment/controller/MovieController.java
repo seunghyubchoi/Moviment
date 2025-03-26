@@ -80,4 +80,9 @@ public class MovieController {
         movieService.patchReview(review);
         return "searchResults";
     }
+
+    @GetMapping("/nowPlaying")
+    public void getListOfNowPlaying(Model model) {
+        movieService.getListOfNowPlaying();
+    }
 }
