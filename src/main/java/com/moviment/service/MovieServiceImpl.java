@@ -9,7 +9,6 @@ import com.moviment.model.MovieVO;
 import com.moviment.model.ReviewVO;
 import com.moviment.repository.MovieRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,7 +44,7 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-        public SearchResult searchMovies(String keyword, Model model) {
+    public SearchResult searchMovies(String keyword, Model model) {
         String endPoint = "/search/movie?query=";
         String language = "&language=ko";
         String urlString = null;
@@ -56,7 +55,7 @@ public class MovieServiceImpl implements MovieService {
         int totalPages = 1;
 
         try {
-            while (currentPage <= totalPages && currentPage <= 500) {
+            while (currentPage <= totalPages) {
                 urlString = BASE_URL + endPoint + keyword + language + "&page=" + currentPage;
                 log.debug("요청 url : {}", urlString);
 
@@ -114,6 +113,61 @@ public class MovieServiceImpl implements MovieService {
         }
 
         return new SearchResult(list, totalPages);
+    }
+
+    @Override
+    public List<MovieVO> getListOfNowPlaying() {
+        String endPoint = "/movie/now_playing?";
+        String language = "&language=ko";
+        String urlString = BASE_URL + endPoint + language;
+
+        //HttpEntity<String> entity = new HttpEntity<String>(createHeaders());
+
+        //ResponseEntity<String> response = restTemplate.exchange(urlString, HttpMethod.GET, entity, String.class);
+
+        // Spring 내 HTTP 요청 및 응답 전체(헤더 + 바디) 표현 클래스
+        // 바디 없이 헤더만 전송하므로 Void가 더 명확
+        HttpEntity<Void> entity = new HttpEntity<>(createHeaders()); // -> 생성자 인자에 HttpHeaders 넣으면 헤더만 가진 요청
+
+        // RestTemplate 이용, 외부 API에 HTTP 요청
+        ResponseEntity<String> response = restTemplate.exchange(urlString, HttpMethod.GET, entity, String.class);
+
+        // 응답 본문 가져와 Jaskson으로 문자열을 트리구조의 JSON 객체(JsonNode)로 변환
+        try {
+            JsonNode root = objectMapper.readTree(response.getBody());
+
+            // 위에서 만든 root 노드에서 results 라는 키를 가진 배열(JsonNode)을 꺼냄
+            JsonNode results = root.get("results");
+
+            List<MovieVO> movieList = new ArrayList<>();
+
+            int count = 0;
+            int maxCount = 10;
+
+            for(JsonNode result : results) {
+                if(count >= maxCount) break;
+
+                MovieVO movieVO = new MovieVO(
+                        result.get("id").asInt(),
+                        result.get("title").asText(),
+                        result.get("overview").asText(),
+                        result.get("popularity").asText(),
+                        result.get("poster_path").asText(),
+                        result.get("release_date").asText(),
+                        result.get("vote_average").asText(),
+                        null
+                );
+
+                movieList.add(movieVO);
+                count++;
+            }
+
+            return movieList;
+
+        } catch (Exception e) {
+            throw new MovieException(e.getMessage());
+
+        }
     }
 
     private HttpHeaders createHeaders() {
@@ -196,10 +250,5 @@ public class MovieServiceImpl implements MovieService {
     @Transactional
     public void patchReview(ReviewVO review) {
         movieRepository.patchReview(review);
-    }
-
-    @Override
-    public void getListOfNowPlaying() {
-
     }
 }

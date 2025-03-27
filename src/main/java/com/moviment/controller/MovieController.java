@@ -8,6 +8,8 @@ import com.moviment.model.UserVO;
 import com.moviment.service.MovieService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -81,8 +83,13 @@ public class MovieController {
         return "searchResults";
     }
 
+    @ResponseBody
     @GetMapping("/nowPlaying")
-    public void getListOfNowPlaying(Model model) {
-        movieService.getListOfNowPlaying();
+    public ResponseEntity<?> getListOfNowPlaying(Model model) {
+        List<MovieVO> list = movieService.getListOfNowPlaying();
+        if(list == null || list.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("응답 데이터가 없습니다.");
+        }
+        return ResponseEntity.ok(list); // 200 OK
     }
 }
