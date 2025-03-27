@@ -37,4 +37,20 @@
         <constructor-arg value="12"></constructor-arg>
     </bean>
 
+    <!-- restTemplate 빈 등록-->
+    <bean id="restTemplate" class="org.springframework.web.client.RestTemplate" />
+
+    <!-- objectMapper 빈 등록-->
+    <bean id="objectMapper" class="com.fasterxml.jackson.databind.ObjectMapper" />
+
+    <!-- objectMapper 빈 등록-->
+    <bean id="movieRepository" class="com.moviment.repository.MovieMybatisRepository" />
+
+    <!--  @Autowired 제거, 생성자 주입으로 했었어도 됨  -->
+    <bean id="movieService" class="com.moviment.service.MovieServiceImpl">
+        <property name="restTemplate" ref="restTemplate" />
+        <property name="objectMapper" ref="objectMapper" />
+        <property name="movieRepository" ref="movieRepository" />
+    </bean>
+
 </beans>
