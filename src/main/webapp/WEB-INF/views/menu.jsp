@@ -5,10 +5,8 @@
 </div>
 
 <div class="text-center mb-4">
-    <h6 class="text-dark">
-        ${sessionScope.user.username}님 환영합니다!
-    </h6>
-    <div>
+
+    <div class="d-flex justify-content-center gap-3">
         <a href="/moviment/userInfo">회원정보수정</a>
         <a href="/moviment/favorites">즐겨찾기</a>
     </div>
