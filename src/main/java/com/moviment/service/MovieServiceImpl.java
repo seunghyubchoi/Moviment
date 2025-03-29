@@ -1,6 +1,5 @@
 package com.moviment.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moviment.dto.SearchResult;
@@ -58,7 +57,7 @@ public class MovieServiceImpl implements MovieService {
         try {
             while (currentPage <= totalPages) {
                 urlString = BASE_URL + endPoint + keyword + language + "&page=" + currentPage;
-                log.debug("요청 url : {}", urlString);
+                //log.debug("요청 url : {}", urlString);
 
                 // 직렬화된 결과 (JSON)
                 HttpEntity<String> entity = new HttpEntity<String>(createHeaders());
@@ -117,7 +116,7 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public List<MovieVO> getListOfMovieListByType(String movieListTypeInMain) {
+    public List<MovieVO> getListOfMovieListByType(String movieListTypeInMain, int userPage) {
         String endPoint = "";
 
         if (movieListTypeInMain.equals("nowPlaying")) {
@@ -128,11 +127,16 @@ public class MovieServiceImpl implements MovieService {
             endPoint = "/movie/top_rated?";
         }
         String language = "&language=ko";
-        String urlString = BASE_URL + endPoint + language;
-
-        //HttpEntity<String> entity = new HttpEntity<String>(createHeaders());
-
-        //ResponseEntity<String> response = restTemplate.exchange(urlString, HttpMethod.GET, entity, String.class);
+        String page = "&page=";
+        int tmdbPage = ((userPage - 1) / 2) + 1;
+        if(tmdbPage < 1) {
+            tmdbPage = 1;
+        }
+        //log.debug("userPage : {}", userPage);
+        //log.debug("((userPage - 1) / 2) + 1 : {}", ((userPage - 1) / 2) + 1 );
+        //log.debug("tmdbPage : {}", tmdbPage);
+        String urlString = BASE_URL + endPoint + language + page + tmdbPage;
+        //log.debug(urlString);
 
         // Spring 내 HTTP 요청 및 응답 전체(헤더 + 바디) 표현 클래스
         // 바디 없이 헤더만 전송하므로 Void가 더 명확
@@ -150,11 +154,7 @@ public class MovieServiceImpl implements MovieService {
 
             List<MovieVO> movieList = new ArrayList<>();
 
-            int count = 0;
-            int maxCount = 10;
-
             for (JsonNode result : results) {
-                if (count >= maxCount) break;
 
                 MovieVO movieVO = new MovieVO(
                         result.get("id").asInt(),
@@ -168,10 +168,12 @@ public class MovieServiceImpl implements MovieService {
                 );
 
                 movieList.add(movieVO);
-                count++;
             }
 
-            return movieList;
+            int startIndex = (userPage - 1) % 2 * 10;
+            int endIndex = Math.min(startIndex + 10, movieList.size());
+            //log.debug("startIndex : {}, endIndex : {}", startIndex, endIndex);
+            return movieList.subList(startIndex, endIndex);
 
         } catch (Exception e) {
             throw new MovieException(e.getMessage());

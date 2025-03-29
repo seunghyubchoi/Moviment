@@ -85,9 +85,8 @@ public class MovieController {
 
     @ResponseBody
     @GetMapping("/movies/main/{movieListTypeInMain}")
-    public ResponseEntity<?> getListOfNowPlaying(@PathVariable String movieListTypeInMain) {
-        //List<MovieVO> list = movieService.getListOfNowPlaying();
-        List<MovieVO> list = movieService.getListOfMovieListByType(movieListTypeInMain);
+    public ResponseEntity<?> getListOfNowPlaying(@PathVariable String movieListTypeInMain, @RequestParam(name = "page", defaultValue = "1") int userPage) {
+        List<MovieVO> list = movieService.getListOfMovieListByType(movieListTypeInMain, userPage);
         if(list == null || list.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("응답 데이터가 없습니다.");
         }

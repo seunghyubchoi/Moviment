@@ -11,26 +11,24 @@
 <script>
     let serverMessage = "${message}";
 </script>
-<body class="bg-secondary bg-opacity-10 min-vh-100 d-flex flex-column">
+<body class="bg-black bg-opacity-10 min-vh-100 d-flex flex-column">
 
 <!-- 상단 메뉴바 -->
 <nav class="navbar navbar-expand-lg bg-dark navbar-dark">
     <div class="container d-flex align-items-center">
         <a class="navbar-brand fw-bold fs-3 text-white me-4" href="/moviment">MOVIMENT</a>
 
-        <div class="collapse navbar-collapse show">
-            <ul class="navbar-nav d-flex flex-row gap-3 align-items-center">
-                <li class="nav-item">
-                    <a class="nav-link text-white fs-5 py-2" href="/moviment/search">Search</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white fs-5 py-2" href="/moviment/board">Board</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white fs-5 py-2" href="/moviment/userInfo">Profile</a>
-                </li>
-            </ul>
-        </div>
+        <ul class="navbar-nav d-flex flex-row gap-3 align-items-end">
+            <li class="nav-item">
+                <a class="nav-link text-white fs-5 py-2" href="/moviment/search">Search</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white fs-5 py-2" href="/moviment/board">Board</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white fs-5 py-2" href="/moviment/userInfo">Profile</a>
+            </li>
+        </ul>
     </div>
 </nav>
 

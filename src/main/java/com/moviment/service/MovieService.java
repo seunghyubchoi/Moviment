@@ -16,5 +16,5 @@ public interface MovieService {
     void deleteReview(ReviewVO review);
     void patchReview(ReviewVO review);
 
-    List<MovieVO> getListOfMovieListByType(String movieListTypeInMain);
+    List<MovieVO> getListOfMovieListByType(String movieListTypeInMain, int userPage);
 }
