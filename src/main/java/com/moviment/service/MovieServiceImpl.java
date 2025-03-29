@@ -1,5 +1,6 @@
 package com.moviment.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moviment.dto.SearchResult;
@@ -116,8 +117,16 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public List<MovieVO> getListOfNowPlaying() {
-        String endPoint = "/movie/now_playing?";
+    public List<MovieVO> getListOfMovieListByType(String movieListTypeInMain) {
+        String endPoint = "";
+
+        if (movieListTypeInMain.equals("nowPlaying")) {
+            endPoint = "/movie/now_playing?";
+        } else if (movieListTypeInMain.equals("upComing")) {
+            endPoint = "/movie/upcoming?";
+        } else if (movieListTypeInMain.equals("topRated")) {
+            endPoint = "/movie/top_rated?";
+        }
         String language = "&language=ko";
         String urlString = BASE_URL + endPoint + language;
 
@@ -144,8 +153,8 @@ public class MovieServiceImpl implements MovieService {
             int count = 0;
             int maxCount = 10;
 
-            for(JsonNode result : results) {
-                if(count >= maxCount) break;
+            for (JsonNode result : results) {
+                if (count >= maxCount) break;
 
                 MovieVO movieVO = new MovieVO(
                         result.get("id").asInt(),

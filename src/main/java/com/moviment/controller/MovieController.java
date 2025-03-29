@@ -84,9 +84,10 @@ public class MovieController {
     }
 
     @ResponseBody
-    @GetMapping("/nowPlaying")
-    public ResponseEntity<?> getListOfNowPlaying(Model model) {
-        List<MovieVO> list = movieService.getListOfNowPlaying();
+    @GetMapping("/movies/main/{movieListTypeInMain}")
+    public ResponseEntity<?> getListOfNowPlaying(@PathVariable String movieListTypeInMain) {
+        //List<MovieVO> list = movieService.getListOfNowPlaying();
+        List<MovieVO> list = movieService.getListOfMovieListByType(movieListTypeInMain);
         if(list == null || list.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("응답 데이터가 없습니다.");
         }
