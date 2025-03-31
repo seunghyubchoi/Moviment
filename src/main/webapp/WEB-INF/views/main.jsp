@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
-<div class="container d-flex align-items-center justify-content-center">
+<div class="container d-flex align-items-center justify-content-center py-5">
     <ul class="navbar-nav d-flex flex-row gap-5 align-items-end" style="column-gap: 3rem; cursor: pointer">
         <li class="nav-item">
             <a class="nav-link text-white fs-5 py-2" onclick="getMoviesInMain('nowPlaying')">현재상영작</a>
@@ -14,6 +14,7 @@
 </div>
 
 
+
 <div id="movie-list">
 </div>
 
@@ -23,6 +24,7 @@
     const listElement = document.getElementById("movie-list");
     const arrowBox = document.getElementById("arrow-area");
 
+    // 하단 화살표 버튼
     const renderPage = (movieListType, page) => {
         arrowBox.innerHTML = "";
         if(!page || page === 1) {
@@ -54,8 +56,8 @@
 
     // 현재 상영작, 개봉예정작, 명예의전당
     const getMoviesInMain = (movieListType, page) => {
-        console.log(movieListType);
-        console.log(page);
+        //console.log(movieListType);
+        //console.log(page);
         fetch('/api/movies/main/' + movieListType + (page ? "?page=" + page : ""))
             .then(response => {
                 if(!response.ok) { // 에러 발생 시
@@ -74,6 +76,8 @@
                     const div = document.createElement("div");
                     const img = document.createElement("img");
                     img.src = "https://image.tmdb.org/t/p/w500" + movie.posterPath;
+                    img.alt = movie.title;
+                    
                     div.appendChild(img);
                     listElement.appendChild(div);
                 })
