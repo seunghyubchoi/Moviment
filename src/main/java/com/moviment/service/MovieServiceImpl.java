@@ -2,6 +2,7 @@ package com.moviment.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.moviment.dto.ListAndPage;
 import com.moviment.dto.SearchResult;
 import com.moviment.dto.UserSessionDTO;
 import com.moviment.exception.MovieException;
@@ -23,6 +24,8 @@ public class MovieServiceImpl implements MovieService {
 
     private static final String API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI0NmIzODFiYWZmZDVlMWJjNjQ3MWM1NzhhMGRlMmNkZCIsIm5iZiI6MTczOTI1NDM1Mi45NTIsInN1YiI6IjY3YWFlYTUwN2M5OTEwODE0ZjliOWEyZSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.pkH2ShDZuAAUGdq_FYntp-Xhy6u5b1DnSyeQ0IATohU";
     private static final String BASE_URL = "https://api.themoviedb.org/3";
+    private static final int pageSize = 10;
+    private static final int groupSize = 5;
 
     private RestTemplate restTemplate;
     private ObjectMapper objectMapper;
@@ -57,7 +60,7 @@ public class MovieServiceImpl implements MovieService {
         try {
             while (currentPage <= totalPages) {
                 urlString = BASE_URL + endPoint + keyword + language + "&page=" + currentPage;
-                //log.debug("요청 url : {}", urlString);
+                log.debug("요청 url : {}", urlString);
 
                 // 직렬화된 결과 (JSON)
                 HttpEntity<String> entity = new HttpEntity<String>(createHeaders());
@@ -178,6 +181,92 @@ public class MovieServiceImpl implements MovieService {
         } catch (Exception e) {
             throw new MovieException(e.getMessage());
 
+        }
+    }
+
+    // 영화 검색
+    @Override
+    public ListAndPage searchMovies(String keyword, int userPage) {
+        String endPoint = "/search/movie?query=";
+        String language = "&language=ko";
+        String page = "&page=";
+        String urlString = null;
+        int tmdbPage = ((userPage - 1) / 2) + 1;
+        if(tmdbPage < 1) {
+            tmdbPage = 1;
+        }
+
+        urlString = BASE_URL + endPoint + keyword + language + page + tmdbPage;
+        log.debug("urlString : {}", urlString);
+        List<MovieVO> list = new ArrayList<>();
+
+        HttpEntity<Void> entity = new HttpEntity<>(createHeaders());
+        ResponseEntity<String> response = restTemplate.exchange(urlString, HttpMethod.GET, entity, String.class);
+        log.debug("response.getBody() : {}", response.getBody());
+
+        if(!response.getStatusCode().is2xxSuccessful()) {
+            throw new MovieException("TMDB API 호출 실패 : " + response.getStatusCode());
+        }
+
+        if(response.getBody() == null) {
+            throw new MovieException("TMDB API 응답이 비어 있습니다.");
+        }
+
+        try {
+            JsonNode root = objectMapper.readTree(response.getBody());
+
+            log.debug("root : {}", root);
+
+            JsonNode results = root.get("results");
+
+            int totalResultsCount = Integer.parseInt(String.valueOf(root.get("total_results")));
+
+            // pageSize = 10(한 페이지에 10)
+            int totalPages = (int) Math.ceil((double)totalResultsCount / pageSize); // 전체 데이터 개수 / 한 페이지의 데이터 개수
+            // 190개면 10개 나눴을 때 19페이지가 나옴
+
+            int pageGroup = (int) Math.ceil((double)userPage / groupSize); // 1~5, 6~10
+            // 사용자가 19페이지 선택, groupSize는 한 페이지네이션 당 보여줄 목록의 개수
+            // 19 / 5 는 3.xx.. 올리면 4
+
+            // 현재 그룹의 마지막 페이지
+            int lastPage = pageGroup * groupSize; // 4 * 5 = 20
+
+            if(lastPage > totalPages) { // 그런데 totalPages는 19, lastPage는 20일 때 20까지 보여줄 필요가 없기에
+                lastPage = totalPages;
+            }
+
+            // 현재 그룹의 첫번째 페이지
+            int firstPage = lastPage - groupSize + 1;
+            if(firstPage < 1) { //firstPage = 3 - 5 + 1 = -1 (x)
+                firstPage = 1;
+            }
+
+            List<MovieVO> movieList = new ArrayList<>();
+
+            for (JsonNode result : results) {
+
+                MovieVO movieVO = new MovieVO(
+                        result.get("id").asInt(),
+                        result.get("title").asText(),
+                        result.get("overview").asText(),
+                        result.get("popularity").asText(),
+                        result.get("poster_path").asText(),
+                        result.get("release_date").asText(),
+                        result.get("vote_average").asText(),
+                        null
+                );
+
+                movieList.add(movieVO);
+            }
+
+            int startIndex = (userPage - 1) % 2 * 10;
+            int endIndex = Math.min(startIndex + 10, movieList.size());
+
+            //log.debug("startIndex : {}, endIndex : {}", startIndex, endIndex);
+            return new ListAndPage(movieList, totalPages, pageGroup, userPage, firstPage, lastPage);
+        } catch (Exception e) {
+            throw new MovieException(e.getMessage());
         }
     }
 

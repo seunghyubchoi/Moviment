@@ -32,12 +32,9 @@
     </div>
 </nav>
 
-<!-- nav 아래 배경 연결 -->
-<div class="bg-dark py-2"></div>
-
 <!-- 중앙 콘텐츠 -->
-<div class="flex-grow-1 bg-dark d-flex justify-content-center align-items-center py-5">
-    <div class="bg-white rounded-4 shadow p-5" style="min-width: 700px; max-width: 1000px; width: 100%; min-height: 600px;">
+<div class="flex-grow-1 bg-dark d-flex justify-content-center align-items-center">
+    <div class="bg-white rounded-4 shadow p-3" style="min-width: 900px; max-width: 1000px; width: 100%; min-height: 700px;">
         <section id="content">
             <jsp:include page="${contentPage}"/>
         </section>

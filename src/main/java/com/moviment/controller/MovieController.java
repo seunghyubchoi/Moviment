@@ -1,5 +1,6 @@
 package com.moviment.controller;
 
+import com.moviment.dto.ListAndPage;
 import com.moviment.dto.SearchResult;
 import com.moviment.dto.UserSessionDTO;
 import com.moviment.model.MovieVO;
@@ -29,6 +30,7 @@ public class MovieController {
         this.movieService = movieService;
     }
 
+    /*
     @GetMapping("/movies")
     public String search(@ModelAttribute("message") String message, @RequestParam(defaultValue = "1") int page, String keyword, Model model) {
         SearchResult searchResult = movieService.searchMovies(keyword, model);
@@ -48,8 +50,19 @@ public class MovieController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPage", totalPages);
         return "searchResults";
-    }
+    }*/
 
+    @ResponseBody
+    @GetMapping("/movies/{keyword}")
+    public ResponseEntity<?> search(@PathVariable String keyword,
+                                    @RequestParam(name = "page", required = false, defaultValue = "1") int userPage) {
+        ListAndPage list = movieService.searchMovies(keyword, userPage);
+        if(list == null || list.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("응답 데이터가 없습니다.");
+        }
+        return ResponseEntity.ok(list);
+    }
+/*
     @GetMapping("/movies/{id}")
     public String searchDetail(@PathVariable int id, Model model) {
         MovieVO movieDetail = movieService.searchDetail(id, model);
@@ -62,7 +75,7 @@ public class MovieController {
         }
         return "searchResults";
     }
-
+*/
     @PostMapping("/review")
     public String addReview(HttpSession session, @RequestBody ReviewVO review, Model model) {
         UserSessionDTO user = (UserSessionDTO) session.getAttribute("user");
@@ -83,6 +96,7 @@ public class MovieController {
         return "searchResults";
     }
 
+    // 메인페이지 현재상영작, 개봉예정작, 명예의전당 조회
     @ResponseBody
     @GetMapping("/movies/main/{movieListTypeInMain}")
     public ResponseEntity<?> getListOfNowPlaying(@PathVariable String movieListTypeInMain, @RequestParam(name = "page", defaultValue = "1") int userPage) {
