@@ -17,6 +17,7 @@ public class ListAndPage {
     private int currentPage; // 현재 페이지 번호 표기용
     private int firstPage; // 그룹 첫번째 번호
     private int lastPage; // 그룹 마지막 번호
+    private String keyword;
 
     public boolean isEmpty() {
         return movieVOList == null || movieVOList.isEmpty();

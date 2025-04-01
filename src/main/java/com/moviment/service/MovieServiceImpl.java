@@ -264,7 +264,7 @@ public class MovieServiceImpl implements MovieService {
             int endIndex = Math.min(startIndex + 10, movieList.size());
 
             //log.debug("startIndex : {}, endIndex : {}", startIndex, endIndex);
-            return new ListAndPage(movieList, totalPages, pageGroup, userPage, firstPage, lastPage);
+            return new ListAndPage(movieList.subList(startIndex, endIndex), totalPages, pageGroup, userPage, firstPage, lastPage, keyword);
         } catch (Exception e) {
             throw new MovieException(e.getMessage());
         }
