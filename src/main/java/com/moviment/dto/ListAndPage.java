@@ -9,7 +9,6 @@ import java.util.List;
 
 @AllArgsConstructor
 @Getter
-@Setter
 public class ListAndPage {
     private List<MovieVO> movieVOList; // 현재 페이지의 영화 목록
     private int totalPages; // 전체 페이지수 끝자락 갈때 쓸 용도
