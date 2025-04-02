@@ -3,6 +3,7 @@ package com.moviment.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moviment.dto.ListAndPage;
+import com.moviment.dto.MovieVOAndReview;
 import com.moviment.dto.SearchResult;
 import com.moviment.dto.UserSessionDTO;
 import com.moviment.exception.MovieException;
@@ -275,6 +276,58 @@ public class MovieServiceImpl implements MovieService {
         headers.set("Accept", "application/json");
         headers.set("Authorization", "Bearer " + API_KEY);
         return headers;
+    }
+
+
+    @Override
+    @Transactional
+    public MovieVO searchDetail(int id) {
+        // DB에 해당 ID의 영화 정보가 있는지 검색
+        MovieVO movieVO = movieRepository.findMovieById(id);
+
+        if(movieVO != null) {
+            // 있으면 DB 정보 RETURN
+            return movieVO;
+        } else {
+            // 없으면 DB에 불러온 API 정보 INSERT
+            String endPoint = "/movie/";
+            String language = "?language=ko";
+            String urlString = BASE_URL + endPoint + id + language;
+
+            try {
+                HttpEntity<String> entity = new HttpEntity<String>(createHeaders());
+
+                ResponseEntity<String> response = restTemplate.exchange(urlString, HttpMethod.GET, entity, String.class);
+
+                if (!response.getStatusCode().is2xxSuccessful()) {
+                    throw new MovieException("TMDB API 호출 실패 : " + response.getStatusCode());
+                }
+
+                if (response.getBody() == null) {
+                    throw new MovieException("TMDB API 응답이 비어 있습니다.");
+                }
+
+                JsonNode results = objectMapper.readTree(response.getBody()); // 응답 데이터
+
+                movieVO = new MovieVO(
+                        results.get("id").asInt(),
+                        results.get("title").asText(),
+                        results.get("overview").asText(),
+                        results.get("popularity").asText(),
+                        results.get("poster_path").asText(),
+                        results.get("release_date").asText(),
+                        results.get("vote_average").asText(),
+                        null
+                );
+
+                // DB 해당 MovieVO 정보 저장
+                movieRepository.saveMovie(movieVO); // @Transactional
+
+                return movieVO;
+            } catch (Exception e) {
+                throw new MovieException(e.getMessage());
+            }
+        }
     }
 
     @Override

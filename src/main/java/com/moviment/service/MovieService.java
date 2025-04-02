@@ -1,6 +1,7 @@
 package com.moviment.service;
 
 import com.moviment.dto.ListAndPage;
+import com.moviment.dto.MovieVOAndReview;
 import com.moviment.dto.SearchResult;
 import com.moviment.dto.UserSessionDTO;
 import com.moviment.model.MovieVO;
@@ -20,4 +21,6 @@ public interface MovieService {
     List<MovieVO> getListOfMovieListByType(String movieListTypeInMain, int userPage);
     // 검색을 통한 영화 조회
     ListAndPage searchMovies(String keyword, int userPage);
+    // 상세 페이지 및 댓글 조회
+    MovieVO searchDetail(int id);
 }

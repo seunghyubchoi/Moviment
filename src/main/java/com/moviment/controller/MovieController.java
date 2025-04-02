@@ -1,6 +1,7 @@
 package com.moviment.controller;
 
 import com.moviment.dto.ListAndPage;
+import com.moviment.dto.MovieVOAndReview;
 import com.moviment.dto.SearchResult;
 import com.moviment.dto.UserSessionDTO;
 import com.moviment.model.MovieVO;
@@ -57,13 +58,24 @@ public class MovieController {
     public ResponseEntity<?> search(@PathVariable String keyword,
                                     @RequestParam(name = "page", required = false, defaultValue = "1") int userPage) {
         ListAndPage list = movieService.searchMovies(keyword, userPage);
-        if(list == null || list.isEmpty()) {
+        if(list == null || list.getMovieVOList().isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("응답 데이터가 없습니다.");
         }
         return ResponseEntity.ok(list);
     }
-/*
-    @GetMapping("/movies/{id}")
+
+    @ResponseBody
+    @GetMapping("/movies/detail/{id}")
+    public ResponseEntity<?> searchDetail(@PathVariable int id,
+                                          @RequestParam(name = "page", defaultValue = "1") int userPage,
+                                          @RequestParam(name = "keyword") String keyword) {
+        MovieVO movieDetail = movieService.searchDetail(id);
+        List<ReviewVO> reviewList = movieService.searchReview(id);
+        return ResponseEntity.ok(new MovieVOAndReview(movieDetail, reviewList, userPage, keyword));
+    }
+
+
+/*    @GetMapping("/movies/{id}")
     public String searchDetail(@PathVariable int id, Model model) {
         MovieVO movieDetail = movieService.searchDetail(id, model);
         List<ReviewVO> reviewList = movieService.searchReview(id);
@@ -74,8 +86,8 @@ public class MovieController {
             model.addAttribute("reviewList", reviewList); // 댓글 있는 경우 추가
         }
         return "searchResults";
-    }
-*/
+    }*/
+
     @PostMapping("/review")
     public String addReview(HttpSession session, @RequestBody ReviewVO review, Model model) {
         UserSessionDTO user = (UserSessionDTO) session.getAttribute("user");

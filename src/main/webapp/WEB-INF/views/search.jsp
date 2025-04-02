@@ -2,27 +2,34 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!-- 검색 폼 -->
-<form id="searchForm" class="d-flex gap-2">
-    <div class="flex-grow-1">
-        <input type="text" class="form-control" name="keyword" id="keyword" placeholder="검색어를 입력하세요" value="${keyword}">
-    </div>
-    <button type="submit" class="btn btn-dark">검색</button>
-</form>
+<section id="sectionSection">
+    <form id="searchForm" class="d-flex gap-2">
+        <div class="flex-grow-1">
+            <input type="text" class="form-control" name="keyword" id="keyword" placeholder="검색어를 입력하세요" value="${keyword}">
+        </div>
+        <button type="submit" class="btn btn-dark">검색</button>
+    </form>
+    <button id="prevPageBtn" class="btn btn-dark d-none">이전</button>
+</section>
+
 
 <!-- 검색 결과 영역 -->
-<div class="movie-container" id="searchResults">
+<section class="movie-container" id="searchResults">
     <%--<jsp:include page="searchResults.jsp"/>--%>
-</div>
+</section>
 
-<div class="d-flex justify-content-center" id="searchPagination" style="margin-top: 20px">
-</div>
+<section class="d-flex justify-content-center" id="searchPagination" style="margin-top: 20px">
+</section>
 
 <script>
     // 영화 검색 by 키워드
+    const sectionSection = document.getElementById('sectionSection');
     const searchForm = document.getElementById('searchForm');
     const searchResults = document.getElementById('searchResults');
     const searchPagination = document.getElementById('searchPagination');
+    const prevPageBtn = document.getElementById('prevPageBtn');
 
+    // 검색 버튼 클릭 시
     searchForm.addEventListener('submit', function(event) {
         event.preventDefault();
         const keyword = document.getElementById('keyword').value;
@@ -31,6 +38,7 @@
 
     // 영화 검색
     const searchMovies = (keyword, page = 1) => {
+
         fetch('/api/movies/' + encodeURIComponent(keyword) + '?page=' + page)
             .then(response => {
                 if(!response.ok) {
@@ -54,9 +62,13 @@
     // 영화 카드 생성
     const createMovieCard = (data) => {
 
+        const keyword = data.keyword;
+        const currentPage = data.currentPage;
+
         searchResults.innerHTML = "";
 
         data.movieVOList.forEach(movie => {
+
             const movieCard = document.createElement('div');
             movieCard.classList.add('movie-card');
 
@@ -71,7 +83,155 @@
             movieCard.appendChild(movieImg);
             movieCard.appendChild(movieTitle);
 
+            movieCard.addEventListener('click', (e) => {
+                e.preventDefault();
+                moveToMovieDetail(movie.id, keyword, currentPage);
+            })
+
             searchResults.appendChild(movieCard);
+        });
+    }
+
+    // 영화 상세 페이지
+    const moveToMovieDetail = (movieId, keyword, currentPage) => {
+        fetch('/api/movies/detail/' + movieId + '?keyword=' + encodeURIComponent(keyword) + '&page=' + currentPage)
+            .then(response => {
+                if(!response.ok) {
+                    return response.text()
+                        .then(errorMessage => {
+                            throw new Error(errorMessage);
+                        })
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(data);
+
+                const prevPage = data.targetPage;
+                const movieVO = data.movieVO;
+                const reviewVOList = data.reviewVOList;
+
+                // 검색창 숨김, 이전버튼 표기
+                hideSearchFormAndDisplayPrevPageBtn(keyword, prevPage);
+
+                // 영화 상세 내용 표기
+                showMovieDetail(movieVO);
+
+                // 댓글 표기
+                showReviewsSection(reviewVOList);
+
+            })
+    }
+
+    const showReviewsSection = (movieVO, reviewVOList) => {
+        showReviewInsertSection(movieVO);
+        showReviewListSection(reviewVOList);
+    }
+
+    // 영화에 대한 댓글 입력
+    const showReviewInsertSection = (movieVO) => {
+        const reviewSection = document.createElement('div');
+        reviewSection.classList.add('review-section');
+
+        const reviewForm = document.createElement('form');
+
+        const hiddenMovieId = document.createElement('input');
+        hiddenMovieId.type = "hidden";
+        hiddenMovieId.id = "movieId";
+        hiddenMovieId.name = "movieId";
+        hiddenMovieId.value = movieVO.id;
+        reviewForm.appendChild(hiddenMovieId);
+
+        const reviewTextarea = document.createElement('textarea');
+        reviewTextarea.rows = 2;
+        reviewTextarea.placeholder = "댓글을 입력하세요."
+        reviewTextarea.required = true;
+        reviewForm.appendChild(reviewTextarea);
+
+        const reviewAddButton = document.createElement('button');
+        reviewAddButton.innerHTML = "등록";
+        reviewAddButton.classList.add("btn", "btn-dark");
+        reviewAddButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            const reviewText = reviewTextarea.value;
+            const movieId = document.getElementById('movieId').value;
+
+            if (!reviewText.trim()) {
+                alert("댓글을 입력하세요.");
+                return;
+            }
+
+            const reviewVO = {
+                movieId: movieId,
+                reviewText: reviewText
+            };
+        })
+
+        reviewForm.appendChild(reviewAddButton);
+
+        reviewSection.appendChild(reviewForm);
+        searchResults.appendChild(reviewSection);
+    }
+
+    // 영화에 대한 댓글 목록
+    const showReviewListSection = (reviewVOList) => {
+        const reviewListSection = document.createElement('div');
+        reviewListSection.classList.add('review-list')
+
+        reviewVOList.forEach(reviewVO => {
+            
+        });
+    }
+
+    // 영화 상세 내용 표기
+    const showMovieDetail = (movieVO) => {
+        const movieDetail = document.createElement('div');
+        movieDetail.classList.add('movie-detail');
+
+        const movieImg = document.createElement('img');
+        movieImg.src = "https://image.tmdb.org/t/p/w500" + movieVO.posterPath;
+        movieImg.alt = movieVO.title;
+
+        const movieInfo = document.createElement('div');
+        movieInfo.classList.add('movie-info');
+
+        const title = document.createElement('div');
+        title.innerText = "제목 : " + movieVO.title;
+
+        const overview = document.createElement('div');
+        overview.innerHTML = "줄거리 : " + movieVO.overview;
+
+        const releaseDate = document.createElement('div');
+        releaseDate.innerHTML = "개봉일 : " + movieVO.releaseDate;
+
+        const popularity = document.createElement('div');
+        popularity.innerHTML = "인기도 : " + movieVO.popularity;
+
+        const voteAverage = document.createElement('div');
+        voteAverage.innerHTML = "평점 : " + movieVO.voteAverage;
+
+        movieInfo.appendChild(title);
+        movieInfo.appendChild(overview);
+        movieInfo.appendChild(releaseDate);
+        movieInfo.appendChild(popularity);
+        movieInfo.appendChild(voteAverage);
+
+        movieDetail.appendChild(movieImg);
+        movieDetail.appendChild(movieInfo);
+
+        searchResults.appendChild(movieDetail);
+    }
+
+    // 검색창 감추고 이전 버튼 표기
+    const hideSearchFormAndDisplayPrevPageBtn = (keyword, prevPage) => {
+        searchForm.classList.add("d-none");
+        searchResults.innerHTML = "";
+        searchPagination.innerHTML = "";
+
+        prevPageBtn.classList.remove("d-none");
+        prevPageBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            moveToPage(keyword, prevPage);
         });
     }
 
@@ -155,6 +315,8 @@
 
     // 페이지 번호 이동
     const moveToPage = (keyword, page) => {
+        searchForm.classList.remove("d-none");
+        prevPageBtn.classList.add("d-none");
         searchMovies(keyword, page);
     }
 </script>
