@@ -125,7 +125,7 @@
 
     const showReviewsSection = (movieVO, reviewVOList) => {
         showReviewInsertSection(movieVO);
-        showReviewListSection(reviewVOList);
+        showReviewListSection(movieVO, reviewVOList);
     }
 
     // 영화에 대한 댓글 입력
@@ -174,12 +174,34 @@
     }
 
     // 영화에 대한 댓글 목록
-    const showReviewListSection = (reviewVOList) => {
+    const currentUserId = "${sessionScope.userId}";
+
+    const showReviewListSection = (movieVO, reviewVOList) => {
+        console.log(reviewVOList);
         const reviewListSection = document.createElement('div');
         reviewListSection.classList.add('review-list')
 
+        reviewListSection.innerHTML = "<h3>댓글 목록</h3>";
+
         reviewVOList.forEach(reviewVO => {
-            
+            const isWriter = reviewVO.userId === currentUserId;
+            const review = `
+            <div class="review">
+                <p><strong>${reviewVO.userName}</strong>: ${reviewVO.content}</p>
+                <p class="review-date">${reviewVO.createdAt}</p>
+                ${isWriter ?
+                "<div>" +
+                    "<button class='btn btn-sm btn-primary me-2' onclick='patchReview(${reviewVO.id})'>"
+                      + "<i class='bi bi-pencil'></i> 수정"
+                   + "</button>"
+                   + "<button class='btn btn-sm btn-danger' onclick='deleteReview(${review.id})'>"
+                       + "<i class='bi bi-trash'></i> 삭제"
+                    + "</button>"
+                + "</div>" : ""
+                }
+            </div>
+            `;
+            reviewListSection.innerHTML += review;
         });
     }
 
