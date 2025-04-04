@@ -89,11 +89,11 @@ html {
 }
 
 #movie-list > div:hover {
-    transform: scale(1.5);
+    transform: scale(1.2);
 }
 
 .movie-card:hover {
-    transform: scale(1.5);
+    transform: scale(1.2);
 }
 
 .movie-card img {
