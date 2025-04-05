@@ -31,28 +31,6 @@ public class MovieController {
         this.movieService = movieService;
     }
 
-    /*
-    @GetMapping("/movies")
-    public String search(@ModelAttribute("message") String message, @RequestParam(defaultValue = "1") int page, String keyword, Model model) {
-        SearchResult searchResult = movieService.searchMovies(keyword, model);
-
-        List<MovieVO> movieList = searchResult.getMovieVOList();
-        int totalPages = searchResult.getTotalPages(); // 전체 페이지 수
-
-        // 20개씩 끊어서 보여주기
-        int startIndex = (page - 1) * 20; // List 인덱스 start
-        int endIndex = Math.min(startIndex + 20, movieList.size()); // List 인덱스 end
-
-        List<MovieVO> paginatedMovieList = movieList.subList(startIndex, endIndex); // start 부터 end 까지의 List
-
-
-        model.addAttribute("movieList", paginatedMovieList);
-        model.addAttribute("keyword", keyword);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPage", totalPages);
-        return "searchResults";
-    }*/
-
     @ResponseBody
     @GetMapping("/movies/{keyword}")
     public ResponseEntity<?> search(@PathVariable String keyword,
@@ -74,38 +52,30 @@ public class MovieController {
         return ResponseEntity.ok(new MovieVOAndReview(movieDetail, reviewList, userPage, keyword));
     }
 
-
-/*    @GetMapping("/movies/{id}")
-    public String searchDetail(@PathVariable int id, Model model) {
-        MovieVO movieDetail = movieService.searchDetail(id, model);
-        List<ReviewVO> reviewList = movieService.searchReview(id);
-
-        model.addAttribute("movieDetail", movieDetail); // 영화 상세 페이지 모델 내 추가
-
-        if(reviewList != null) {
-            model.addAttribute("reviewList", reviewList); // 댓글 있는 경우 추가
-        }
-        return "searchResults";
-    }*/
-
+    @ResponseBody
     @PostMapping("/review")
-    public String addReview(HttpSession session, @RequestBody ReviewVO review, Model model) {
+    public ResponseEntity<?> addReview(HttpSession session, @RequestBody ReviewVO review) {
         UserSessionDTO user = (UserSessionDTO) session.getAttribute("user");
+        if(user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
         log.info("user : {}", user);
         movieService.addReview(user, review);
-        return "searchResults";
+        return ResponseEntity.ok("review add success");
     }
 
+    @ResponseBody
     @DeleteMapping("/review")
-    public String deleteReview(@RequestBody ReviewVO review) {
+    public ResponseEntity<?> deleteReview(@RequestBody ReviewVO review) {
         movieService.deleteReview(review);
-        return "searchResults";
+        return ResponseEntity.ok("review delete success");
     }
 
+    @ResponseBody
     @PatchMapping("/review")
-    public String patchReview(@RequestBody ReviewVO review) {
+    public ResponseEntity<?> patchReview(@RequestBody ReviewVO review) {
         movieService.patchReview(review);
-        return "searchResults";
+        return ResponseEntity.ok("review patch success");
     }
 
     // 메인페이지 현재상영작, 개봉예정작, 명예의전당 조회
