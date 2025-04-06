@@ -1,6 +1,10 @@
+<%@ page import="com.moviment.dto.UserSessionDTO" %>
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
+<%
+    UserSessionDTO sessionUser = (UserSessionDTO) session.getAttribute("user");
+    String sessionUserId = sessionUser != null ? sessionUser.getId() : "";
+%>
 <!-- 검색 폼 -->
 <section id="sectionSection">
     <form id="searchForm" class="d-flex gap-2">
@@ -29,6 +33,10 @@
     const searchPagination = document.getElementById('searchPagination');
     const prevPageBtn = document.getElementById('prevPageBtn');
 
+    // 전역변수 keyword, currentPage => 댓글 등록 후 다시 사용하는 용도로 저장해둠
+    let globalKeyword = "";
+    let globalCurrentPage = 1;
+
     // 검색 버튼 클릭 시
     searchForm.addEventListener('submit', function(event) {
         event.preventDefault();
@@ -36,19 +44,10 @@
         searchMovies(keyword);
     });
 
-    // 영화 검색
+    // 영화 전체 검색
     const searchMovies = (keyword, page = 1) => {
-
         fetch('/api/movies/' + encodeURIComponent(keyword) + '?page=' + page)
-            .then(response => {
-                if(!response.ok) {
-                    return response.text()
-                        .then(errorMessage => {
-                            throw new Error(errorMessage);
-                        })
-                }
-                return response.json();
-            })
+            .then(handleResponse)
             .then(data => {
                 createMovieCard(data);
                 createPagination(data);
@@ -59,10 +58,38 @@
             })
     }
 
+    // 영화 상세 페이지 검색
+    const moveToMovieDetail = (movieId, keyword, currentPage) => {
+        currentPage = currentPage || 1;
+        keyword = keyword || "";
+
+        fetch('/api/movies/detail/' + movieId + '?keyword=' + encodeURIComponent(keyword) + '&page=' + currentPage)
+            .then(handleResponse)
+            .then(data => {
+                const prevPage = data.targetPage;
+                const movieVO = data.movieVO;
+                const reviewVOList = data.reviewVOList;
+
+                // 검색창 숨김, 이전버튼 표기
+                hideSearchFormAndDisplayPrevPageBtn(keyword, prevPage);
+
+                // 영화 상세 내용 표기
+                showMovieDetail(movieVO);
+
+                // 댓글 표기
+                showReviewsSection(movieVO, reviewVOList);
+
+            })
+    }
+
     // 영화 카드 생성
     const createMovieCard = (data) => {
 
+        globalKeyword = data.keyword;
+        globalCurrentPage = data.currentPage;
+
         const keyword = data.keyword;
+
         const currentPage = data.currentPage;
 
         searchResults.innerHTML = "";
@@ -82,47 +109,17 @@
 
             movieCard.appendChild(movieImg);
             movieCard.appendChild(movieTitle);
-
-            movieCard.addEventListener('click', (e) => {
+            movieCard.onclick = null;
+            movieCard.onclick = (e) => {
                 e.preventDefault();
                 moveToMovieDetail(movie.id, keyword, currentPage);
-            })
+            }
 
             searchResults.appendChild(movieCard);
         });
     }
 
-    // 영화 상세 페이지
-    const moveToMovieDetail = (movieId, keyword, currentPage) => {
-        fetch('/api/movies/detail/' + movieId + '?keyword=' + encodeURIComponent(keyword) + '&page=' + currentPage)
-            .then(response => {
-                if(!response.ok) {
-                    return response.text()
-                        .then(errorMessage => {
-                            throw new Error(errorMessage);
-                        })
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log(data);
-
-                const prevPage = data.targetPage;
-                const movieVO = data.movieVO;
-                const reviewVOList = data.reviewVOList;
-
-                // 검색창 숨김, 이전버튼 표기
-                hideSearchFormAndDisplayPrevPageBtn(keyword, prevPage);
-
-                // 영화 상세 내용 표기
-                showMovieDetail(movieVO);
-
-                // 댓글 표기
-                showReviewsSection(reviewVOList);
-
-            })
-    }
-
+    // 댓글 표기
     const showReviewsSection = (movieVO, reviewVOList) => {
         showReviewInsertSection(movieVO);
         showReviewListSection(movieVO, reviewVOList);
@@ -133,7 +130,7 @@
         const reviewSection = document.createElement('div');
         reviewSection.classList.add('review-section');
 
-        const reviewForm = document.createElement('form');
+        const reviewForm = document.createElement('div');
 
         const hiddenMovieId = document.createElement('input');
         hiddenMovieId.type = "hidden";
@@ -151,21 +148,8 @@
         const reviewAddButton = document.createElement('button');
         reviewAddButton.innerHTML = "등록";
         reviewAddButton.classList.add("btn", "btn-dark");
-        reviewAddButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            const reviewText = reviewTextarea.value;
-            const movieId = document.getElementById('movieId').value;
-
-            if (!reviewText.trim()) {
-                alert("댓글을 입력하세요.");
-                return;
-            }
-
-            const reviewVO = {
-                movieId: movieId,
-                reviewText: reviewText
-            };
-        })
+        reviewAddButton.onclick = null;
+        reviewAddButton.onclick = () => addReview(hiddenMovieId.value, reviewTextarea.value);
 
         reviewForm.appendChild(reviewAddButton);
 
@@ -174,35 +158,67 @@
     }
 
     // 영화에 대한 댓글 목록
-    const currentUserId = "${sessionScope.userId}";
-
+    const currentUserId = "<%=sessionUserId%>";
     const showReviewListSection = (movieVO, reviewVOList) => {
-        console.log(reviewVOList);
         const reviewListSection = document.createElement('div');
         reviewListSection.classList.add('review-list')
 
-        reviewListSection.innerHTML = "<h3>댓글 목록</h3>";
-
         reviewVOList.forEach(reviewVO => {
             const isWriter = reviewVO.userId === currentUserId;
-            const review = `
-            <div class="review">
-                <p><strong>${reviewVO.userName}</strong>: ${reviewVO.content}</p>
-                <p class="review-date">${reviewVO.createdAt}</p>
-                ${isWriter ?
-                "<div>" +
-                    "<button class='btn btn-sm btn-primary me-2' onclick='patchReview(${reviewVO.id})'>"
-                      + "<i class='bi bi-pencil'></i> 수정"
-                   + "</button>"
-                   + "<button class='btn btn-sm btn-danger' onclick='deleteReview(${review.id})'>"
-                       + "<i class='bi bi-trash'></i> 삭제"
-                    + "</button>"
-                + "</div>" : ""
-                }
-            </div>
-            `;
-            reviewListSection.innerHTML += review;
+
+            const reviewDiv = document.createElement('div');
+            reviewDiv.classList.add('review-item');
+
+            // 왼쪽 : 작성자 + 내용
+            const contentDiv = document.createElement('div');
+            contentDiv.classList.add('review-content');
+            const contentP = document.createElement('p');
+            const writerStrong = document.createElement('strong');
+            writerStrong.textContent = reviewVO.userName;
+            contentP.appendChild(writerStrong);
+            contentP.append(" : " + reviewVO.content);
+            contentDiv.appendChild(contentP);
+
+            // 오른쪽 : 날짜 + 수정 버튼
+            const dateDiv = document.createElement('div');
+            dateDiv.classList.add('review-right');
+
+            // 작성일
+            const dateP = document.createElement('p');
+            dateP.classList.add('review-date');
+            dateP.textContent = reviewVO.createdAt;
+            dateDiv.appendChild(dateP);
+            // 수정 삭제 버튼
+            if (isWriter) { // 본인이 쓴 글인 경우
+                const buttonGroup = document.createElement('div');
+                buttonGroup.classList.add('review-buttons');
+
+                const editBtn = document.createElement('button');
+                editBtn.className = 'btn btn-sm btn-primary me-2';
+                editBtn.innerHTML = '<i class="bi bi-pencil"></i> 수정';
+
+                editBtn.onclick = null;
+                editBtn.onclick = () => patchReview(reviewVO.id);
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'btn btn-sm btn-danger';
+                deleteBtn.innerHTML = '<i class="bi bi-trash"></i> 삭제';
+
+                deleteBtn.onclick = null;
+                deleteBtn.onclick = () => deleteReview(reviewVO.id);
+
+                buttonGroup.appendChild(editBtn);
+                buttonGroup.appendChild(deleteBtn);
+                dateDiv.appendChild(buttonGroup);
+            }
+            // 버튼 추가
+            reviewDiv.appendChild(contentDiv); // 왼쪽
+            reviewDiv.appendChild(dateDiv);  // 오른쪽
+
+            // 댓글 추가
+            reviewListSection.appendChild(reviewDiv);
         });
+        searchResults.appendChild(reviewListSection);
     }
 
     // 영화 상세 내용 표기
@@ -251,10 +267,11 @@
         searchPagination.innerHTML = "";
 
         prevPageBtn.classList.remove("d-none");
-        prevPageBtn.addEventListener('click', (e) => {
+        prevPageBtn.onclick = null;
+        prevPageBtn.onclick = (e) => {
             e.preventDefault();
             moveToPage(keyword, prevPage);
-        });
+        }
     }
 
     // 영화 페이지네이션
@@ -280,11 +297,11 @@
             prevPageLink.classList.add("page-link");
             prevPageLink.href = "#";
             prevPageLink.innerHTML = "<";
-
-            prevPageLink.addEventListener('click', (e) => {
+            prevPageLink.onclick = null;
+            prevPageLink.onclick = (e) => {
                 e.preventDefault();
                 moveToPage(keyword, firstPage - 1);
-            });
+            }
 
             prevPage.appendChild(prevPageLink);
             paginationList.appendChild(prevPage);
@@ -303,11 +320,11 @@
 
             paginationLink.href = '#';
             paginationLink.innerText = i;
-
-            paginationLink.addEventListener('click', (e) => {
+            paginationLink.onclick = null;
+            paginationLink.onclick = (e) => {
                 e.preventDefault();
                 moveToPage(keyword, i);
-            });
+            }
 
             paginationItem.appendChild(paginationLink); // a -> li
             paginationList.appendChild(paginationItem); // li -> ul
@@ -322,11 +339,11 @@
             nextPageLink.classList.add('page-link');
             nextPageLink.href = "#";
             nextPageLink.innerHTML = ">";
-
-            nextPageLink.addEventListener('click', (e) => {
+            nextPageLink.onclick = null;
+            nextPageLink.onclick = (e) => {
                 e.preventDefault();
                 moveToPage(keyword, lastPage + 1);
-            });
+            }
 
             nextPage.appendChild(nextPageLink);
             paginationList.appendChild(nextPage);
@@ -341,4 +358,107 @@
         prevPageBtn.classList.add("d-none");
         searchMovies(keyword, page);
     }
+
+
+
+/****************************
+ 영화 기능 관련 START
+ ****************************/
+// 댓글 추가
+const addReview = (movieId, reviewContent) => {
+
+    if (!reviewContent.trim()) {
+        alert("댓글을 입력하세요.");
+        return;
+    }
+
+    alert("댓글을 등록하시겠습니까?");
+
+    fetch("/api/review", {
+        method: "POST"
+        , headers: {
+            "Content-Type": "application/json"
+        }
+        , body: JSON.stringify({
+            movieId: movieId
+            , content: reviewContent
+        })
+    })
+        .then(response => {
+            if(!response.ok) {
+                handleErrorResponse(response);
+            }
+            moveToMovieDetail(movieId, globalKeyword, globalCurrentPage);
+        })
+}
+
+// 댓글 수정
+const patchReview = (reviewId) => {
+    const movieId = document.getElementById("movieId").value;
+    let newContent = prompt("수정할 내용을 입력하세요");
+    if (newContent !== null && newContent.trim() !== "") {
+        fetch(`/api/review`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: reviewId, content: newContent })
+        })
+            .then(response => {
+                if(!response.ok) {
+                    handleErrorResponse(response);
+                }
+                moveToMovieDetail(movieId, globalKeyword, globalCurrentPage);
+            })
+    }
+}
+
+// 댓글 삭제
+const deleteReview = (reviewId) => {
+    const movieId = document.getElementById("movieId").value;
+    if(confirm("댓글을 삭제하시겠습니까?")) {
+        fetch(`/api/review`, {
+            method: "DELETE"
+            , headers: {"Content-Type" : "application/json"}
+            , body: JSON.stringify({id: reviewId})
+        })
+            .then(response => {
+                if(!response.ok) {
+                    handleErrorResponse(response);
+                }
+                moveToMovieDetail(movieId, globalKeyword, globalCurrentPage);
+            })
+    }
+}
+
+
+/****************************
+ 영화 기능 관련 END
+ ****************************/
+
+
+
+
+/****************************
+ 중복 구문 관련 START
+ ****************************/
+
+// fetch 호출 후 예외 발생 시 데이터에 대한 예외 text 리턴 or json 리턴
+const handleResponse = (response) => {
+    if (!response.ok) {
+        const errorMessage = response.text();
+        throw new Error(errorMessage);
+    }
+    return response.json();
+};
+
+// 댓글 추가, 수정, 삭제 도중 에러 발생 시 중복 예외 구문
+const handleErrorResponse = (response) => {
+    return response.text().then((errorMessage) => {
+        throw new Error(errorMessage);
+    });
+};
+
+
+/****************************
+ 중복 구문 관련 END
+ ****************************/
 </script>

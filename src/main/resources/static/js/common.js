@@ -17,9 +17,6 @@ window.addEventListener("popstate", function (event) {
 // DOM 로드 시 준비되는 함수들
 document.addEventListener("DOMContentLoaded", function() {
     loginValidation(); // 로그인 폼 검증
-    //onSelectMenu(); // 메뉴 클릭 시 AJAX로 content 변경
-    //onSearchMovie(); // 영화 검색 기능
-    onSelectSearchMoviePageNumber(); // 영화 페이지 변경
 });
 
 // 로그인 폼 검증
@@ -64,121 +61,6 @@ function registerValidation() {
             }
         });
     }
-}
-
-// 메뉴 클릭 시 AJAX로 content 변경
-/*
-function onSelectMenu() {
-    document.querySelectorAll(".menu-link").forEach(menuItem => {
-        menuItem.addEventListener("click", function(event) {
-            event.preventDefault();
-
-            document.querySelectorAll(".menu-link").forEach(item => item.classList.remove("active"));
-            this.classList.add("active");
-
-            const contentPage = this.getAttribute("data-content");
-            loadContentPage(contentPage);
-        });
-    });
-}
-*/
-/*
-function onSearchMovie() {
-    let searchForm = document.getElementById("searchForm");
-    if(searchForm) {
-        searchForm.addEventListener("submit", function (event) {
-            event.preventDefault(); // 기본 폼 제출 방지
-
-            let keyword = document.getElementById("keyword").value;
-            fetch("/api/movies?keyword=" + encodeURIComponent(keyword))
-                .then(response => {
-                    if(response.ok) {
-                        return response.text();
-                    } else {
-                        return response.json().then(result => {
-                            return Promise.reject(result.message);
-                        })
-                    }
-                })
-                .then(data => {
-                    document.getElementById("searchResults").innerHTML = data;
-                    onSelectSearchMoviePageNumber();
-                    onSelectSearchMovie(); // 영화 상세 검색 기능
-                })
-                .catch(error => alert(error));
-        });
-    }
-}
-*/
-
-function onSelectSearchMoviePageNumber() {
-    let searchResults = document.getElementById("searchResults");
-    if(searchResults) {
-        document.querySelectorAll(".page-link").forEach(pageNumber => {
-            pageNumber.addEventListener("click", function(event) {
-                event.preventDefault();
-
-                const keyword = this.getAttribute("data-content");
-                const number = this.getAttribute("data-page");
-
-                fetch("/api/movies?keyword=" + encodeURIComponent(keyword) + "&page=" + number)
-                    .then(response => response.text())
-                    .then(data => {
-                        document.getElementById("searchResults").innerHTML = data;
-                        onSelectSearchMoviePageNumber();
-                        onSelectSearchMovie(); // 영화 상세 검색 기능
-                    })
-                    .catch(error => console.error("AJAX 오류:", error));
-            });
-        });
-
-    }
-}
-
-function onSelectSearchMovie() {
-    let searchResults = document.getElementById("searchResults");
-    if(searchResults) {
-        document.querySelectorAll(".movie-card").forEach(movieCard => {
-            movieCard.addEventListener("click", function(event) {
-                event.preventDefault();
-
-                const movieId = this.getAttribute("data-content");
-                onLoadMovieInfo(movieId);
-            });
-        });
-    }
-}
-
-/*function onLoadMovieInfo(movieId) {
-    fetch(`/api/movies/${movieId}`)
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById("searchResults").innerHTML = data;
-            addReview();
-        })
-        .catch(error => console.error("AJAX 오류:", error));
-}*/
-
-
-function loadContentPage(contentPage, addToHistory = true) {
-    fetch("/loadContent?content=" + contentPage) // data-content jsp 반환
-        .then(response => response.text())
-        .then(html => {
-            document.getElementById("content").innerHTML = html;
-
-            if (addToHistory) {
-                history.pushState({ type: contentPage }, "", ""); // URL은 그대로 유지
-            }
-
-            // AJAX로 페이지 로드한 경우, 이벤트 리스너 재등록
-            if(contentPage === "search") {
-                onSearchMovie();
-            } else if(contentPage === "board") {
-                onSearchBoard();
-            }
-
-        })
-        .catch(error => console.error("AJAX 오류:", error));
 }
 
 function onSearchBoard() {
