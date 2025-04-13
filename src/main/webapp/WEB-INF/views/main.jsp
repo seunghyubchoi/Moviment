@@ -1,14 +1,16 @@
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+
 <div class="container d-flex align-items-center justify-content-center py-5">
     <ul class="navbar-nav d-flex flex-row gap-5 align-items-end" style="column-gap: 3rem; cursor: pointer">
         <li class="nav-item">
-            <a class="nav-link text-white fs-5 py-2" onclick="getMoviesInMain('nowPlaying')">현재상영작</a>
+            <a class="nav-link text-white fs-5 py-2" onclick="getMoviesInMain(this, 'nowPlaying')"><spring:message code="message.movie.nowPlaying" /></a>
         </li>
         <li class="nav-item">
-            <a class="nav-link text-white fs-5 py-2" onclick="getMoviesInMain('upComing')">개봉예정작</a>
+            <a class="nav-link text-white fs-5 py-2" onclick="getMoviesInMain(this, 'upComing')"><spring:message code="message.movie.upComing" /></a>
         </li>
         <li class="nav-item">
-            <a class="nav-link text-white fs-5 py-2" onclick="getMoviesInMain('topRated')">명예의전당</a>
+            <a class="nav-link text-white fs-5 py-2" onclick="getMoviesInMain(this, 'topRated')"><spring:message code="message.movie.topRated" /></a>
         </li>
     </ul>
 </div>
@@ -55,9 +57,18 @@
     }
 
     // 현재 상영작, 개봉예정작, 명예의전당
-    const getMoviesInMain = (movieListType, page) => {
-        //console.log(movieListType);
-        //console.log(page);
+    const getMoviesInMain = (element, movieListType, page) => {
+
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.remove('active');
+        });
+
+        if(element)
+        {
+            element.classList.add('active');
+        }
+
+
         fetch('/api/movies/main/' + movieListType + (page ? "?page=" + page : ""))
             .then(response => {
                 if(!response.ok) { // 에러 발생 시
@@ -90,5 +101,5 @@
         renderPage(movieListType, page);
     }
 
-    getMoviesInMain("nowPlaying");
+    getMoviesInMain(null, "nowPlaying", 1);
 </script>
