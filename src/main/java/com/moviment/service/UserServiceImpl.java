@@ -112,6 +112,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void updateUserInfo(@Valid UserInfoDTO user) {
         UserVO savedUser = findByUserEmail(user.getEmail());
         boolean result = checkPassword(user.getCurrentPassword(), savedUser.getPassword());
