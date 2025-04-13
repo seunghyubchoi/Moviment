@@ -26,6 +26,13 @@
     const listElement = document.getElementById("movie-list");
     const arrowBox = document.getElementById("arrow-area");
 
+    // 언어 찾기
+    const getSelectedLang = () => {
+        return localStorage.getItem('lang') || 'ko';
+    }
+
+    const lang = getSelectedLang();
+    console.log(`${lang}!!!!!`);
     // 하단 화살표 버튼
     const renderPage = (movieListType, page) => {
         arrowBox.innerHTML = "";
@@ -59,6 +66,7 @@
     // 현재 상영작, 개봉예정작, 명예의전당
     const getMoviesInMain = (element, movieListType, page) => {
 
+        // 메뉴 버튼 active
         document.querySelectorAll('.nav-link').forEach(link => {
             link.classList.remove('active');
         });
@@ -68,8 +76,9 @@
             element.classList.add('active');
         }
 
+        console.log(lang);
 
-        fetch('/api/movies/main/' + movieListType + (page ? "?page=" + page : ""))
+        fetch('/api/movies/main/' + movieListType + "?page=" + (page || 1) + "&lang=" + lang)
             .then(response => {
                 if(!response.ok) { // 에러 발생 시
                     return response.text()

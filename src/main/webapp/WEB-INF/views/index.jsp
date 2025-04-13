@@ -40,11 +40,11 @@
                     </form>
                     <br>
                     <div>
-                        <a href="?lang=en" class="btn btn-dark">
+                        <a href="?lang=en" onclick="setLang('en')" class="btn btn-dark">
                             en
                         </a>
                         &nbsp;
-                        <a href="?lang=ko" class="btn btn-dark">
+                        <a href="?lang=ko" onclick="setLang('ko')" class="btn btn-dark">
                             ko
                         </a>
                     </div>
@@ -59,6 +59,10 @@
 <script src="${pageContext.request.contextPath}/js/common.js"></script>
 <script>
     let serverMessage = "${message}";
+
+    const setLang = (langCode) => {
+        localStorage.setItem('lang', langCode);
+    }
 </script>
 
 </body>
