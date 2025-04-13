@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
 <html>
 <head>
@@ -20,13 +21,16 @@
 
         <ul class="navbar-nav d-flex flex-row gap-3 align-items-end">
             <li class="nav-item">
-                <a class="nav-link text-white fs-5 py-2" href="/moviment/search">Search</a>
+                <a class="nav-link text-white fs-5 py-2" href="/moviment/search"><spring:message code="message.movie.search"/></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-white fs-5 py-2" href="/moviment/board">Board</a>
+                <a class="nav-link text-white fs-5 py-2" href="/moviment/board"><spring:message code="message.movie.board"/></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-white fs-5 py-2" href="/moviment/userInfo">Profile</a>
+                <a class="nav-link text-white fs-5 py-2" href="/moviment/userInfo"><spring:message code="message.movie.profile"/></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white fs-5 py-2" href="/logout"><spring:message code="message.movie.logout"/></a>
             </li>
         </ul>
     </div>
