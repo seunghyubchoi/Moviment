@@ -6,6 +6,7 @@ import com.moviment.model.UserVO;
 import com.moviment.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,11 +18,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.util.Locale;
+
 @Slf4j
 @Controller
 public class UserController {
 
     private UserService userService;
+    private MessageSource messageSource;
 
     @Autowired
     public void setUserService(UserService userService) {
@@ -58,8 +62,7 @@ public class UserController {
      * @return
      */
     @PostMapping("/register")
-    public String register(@Valid @ModelAttribute UserVO user, BindingResult result, RedirectAttributes redirectAttributes, Model model) {
-        log.debug("register 유효성 검사 시작");
+    public String register(@Valid @ModelAttribute UserVO user, BindingResult result, RedirectAttributes redirectAttributes, Model model, Locale locale) {
         if(result.hasErrors()) {
             log.debug("유효성 검사 실패 : " + result.getAllErrors());
             // 현재 페이지에서 에러 메세지 출력할 것이므로 redirectAttributes -> Model 로 변경
@@ -75,7 +78,8 @@ public class UserController {
         }
 
         userService.saveUser(user);
-        redirectAttributes.addFlashAttribute("message", "회원가입이 완료되었습니다! 가입한 아이디로 로그인하시기 바랍니다.");
+        String message = messageSource.getMessage("alert.register.success", new Object[]{user.getUsername()}, locale);
+        redirectAttributes.addFlashAttribute("message", message);
         return "redirect:/";
     }
 
@@ -83,7 +87,8 @@ public class UserController {
     public String updateUserInfo(@Valid @ModelAttribute("user") UserInfoDTO user,
                                  BindingResult result,
                                  Model model,
-                                 RedirectAttributes redirectAttributes) {
+                                 RedirectAttributes redirectAttributes,
+                                 Locale locale) {
 
         if(result.hasErrors()) {
             model.addAttribute("message", result.getAllErrors().get(0).getDefaultMessage());
@@ -92,7 +97,8 @@ public class UserController {
         }
 
         userService.updateUserInfo(user);
-        redirectAttributes.addFlashAttribute("message", "비밀번호가 성공적으로 변경되었습니다.");
+        String message = messageSource.getMessage("alert.register.passwordChanged", null, locale);
+        redirectAttributes.addFlashAttribute("message", message);
         return "redirect:moviment";
     }
 
@@ -100,5 +106,10 @@ public class UserController {
     public String logout(HttpSession session) {
         session.invalidate();
         return "redirect:/";
+    }
+
+    @Autowired
+    public void setMessageSource(MessageSource messageSource) {
+        this.messageSource = messageSource;
     }
 }
