@@ -9,6 +9,12 @@ TMDB API를 활용한 영화 정보 플랫폼입니다. <br>
 * 회원가입 / 로그인 / 회원 정보 수정
 * 다국어 지원 (한국어, 영어)
 
+<img src="./screenshots/login.png" alt="login" style="width: 30%; max-width: 500px;" />
+<img src="./screenshots/search.png" alt="search" style="width: 30%; max-width: 500px;" />
+<img src="./screenshots/search2.png" alt="search2" style="width: 30%; max-width: 500px;" />
+<img src="./screenshots/search3.png" alt="search3" style="width: 30%; max-width: 500px;" />
+
+
 # 기술 스택
 * Frontend : JSP, HTML5, CSS3, Bootstrap
 * Backend : Java, Spring MVC, MyBatis
@@ -20,6 +26,6 @@ TMDB API를 활용한 영화 정보 플랫폼입니다. <br>
 * API 활용 MovieController, RestController 전환(완료)
 * 한국어 및 영어 다국어 지원(진행 중)
 * 게시판 기능 수정
-* TMDB API 키 노출 방지를 위한 별도 관리 예정
-
+* TMDB API 키 노출 방지 예정
+* TMDB 언어별 테이블 분리
 
